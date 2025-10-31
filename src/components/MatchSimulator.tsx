@@ -1,4 +1,4 @@
-// Em: src/components/MatchSimulator.tsx (VERSÃO MINIMALISTA: SEM QUADRA)
+// Em: src/components/MatchSimulator.tsx (VERSÃO FINAL E MINIMALISTA)
 
 import React, { useMemo } from 'react';
 import { ComboboxSearch } from './ComboboxSearch'; 
@@ -32,7 +32,7 @@ type SimulatorProps = {
 // --- FUNÇÃO DE FILTRO (Mantida) ---
 const filterOddsValue = (value: string) => value.replace(/[^0-9.,]/g, '');
 
-// --- INPUT PADRÃO (Voltando ao p-3) ---
+// --- INPUT PADRÃO (p-3) ---
 const InputDark = React.memo((props: { value: string, onChange: (e: any) => void, placeholder: string, label: string }) => {
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +48,7 @@ const InputDark = React.memo((props: { value: string, onChange: (e: any) => void
                 value={props.value}
                 onChange={handleChange} 
                 placeholder={props.placeholder}
-                // REVERSÃO: Voltando ao p-3 para caixa de texto menor
+                // Voltando ao p-3 para caixa de texto menor
                 className="w-full p-3 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
                 required
             />
