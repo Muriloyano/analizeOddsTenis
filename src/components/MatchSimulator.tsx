@@ -1,11 +1,10 @@
-// Em: src/components/MatchSimulator.tsx
+// Em: src/components/MatchSimulator.tsx (COM INPUTS MAIORES)
 
-import React, { useState, useMemo } from 'react';
-// IMPORTANTE: Usa o ComboboxSearch que já criamos com Tailwind/HTML
+import React, { useMemo } from 'react';
 import { ComboboxSearch } from './ComboboxSearch'; 
 import { toast } from 'sonner';
 
-// --- TIPOS DE DADOS ESTRUTURAIS ---
+// --- TIPOS ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -37,6 +36,7 @@ const filterOddsValue = (value: string) => value.replace(/[^0-9.,]/g, '');
 const InputDark = React.memo((props: { value: string, onChange: (e: any) => void, placeholder: string, label: string }) => {
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Filtragem ocorre no componente pai (onSetOdds)
         props.onChange(e); 
     };
     
@@ -49,7 +49,7 @@ const InputDark = React.memo((props: { value: string, onChange: (e: any) => void
                 value={props.value}
                 onChange={handleChange} 
                 placeholder={props.placeholder}
-                // MUDANÇA: p-4 para caixa de texto maior
+                // GARANTIA: p-4 para caixa de texto maior
                 className="w-full p-4 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
                 required
             />

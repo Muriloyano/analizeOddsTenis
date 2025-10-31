@@ -1,4 +1,4 @@
-// Em: src/pages/Index.tsx (COM AUMENTO DA LARGURA DOS PAINÉIS LATERAIS)
+// Em: src/pages/Index.tsx
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
