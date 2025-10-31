@@ -1,10 +1,8 @@
-// Em: src/components/ComboboxSearch.tsx (CORRIGIDO: Imports e Classes)
+// Em: src/components/ComboboxSearch.tsx (VERSÃO FINAL SIMPLIFICADA E COM TAMANHO AJUSTADO)
 
-import React, { useState, Fragment, useMemo } from 'react';
-// CORREÇÃO: Importar Headless UI (Assumindo que está instalado, se não, rode npm install @headlessui/react)
-import { Combobox, Transition } from '@headlessui/react';
-// CORREÇÃO: Importar o ícone (Assumindo que @heroicons/react está instalado, se não, rode npm install @heroicons/react)
-import { ChevronUpDownIcon } from '@heroicons/react/20/solid'; 
+import React, { useState, useMemo } from 'react';
+// REMOVIDO: import { Combobox, Transition } from '@headlessui/react';
+// REMOVIDO: import { ChevronUpDownIcon } from '@heroicons/react/20/solid'; 
 
 
 // --- TIPOS ---
@@ -19,86 +17,81 @@ type ComboboxSearchProps = {
   items: Item[];
   selectedValue: string;
   onSelect: (value: string) => void;
-  // Nova prop para estilizar o input
+  // A classe para o input, passada pelo MatchSimulator
   inputClassName?: string; 
 };
 
 export function ComboboxSearch({ label, items, selectedValue, onSelect, inputClassName }: ComboboxSearchProps) {
   const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
 
   const filteredItems = useMemo(() => {
-    if (query === '') {
-      // Limita a 50 itens se não houver busca, para performance
-      return items.slice(0, 50); 
-    }
+    if (!query) return items.slice(0, 500); // Limite aumentado para 500
+    
     return items.filter((item) => {
       return item.label.toLowerCase().includes(query.toLowerCase());
     });
   }, [query, items]);
 
-  const displayValue = useMemo(() => {
-    const selectedItem = items.find(item => item.value === selectedValue);
-    if (selectedItem) {
-        const parts = selectedItem.label.split(' (');
-        return parts[0].replace(/^\d+\.\s*/, ''); 
-    }
-    return '';
+  const selectedLabel = useMemo(() => {
+      const selectedItem = items.find(i => i.value === selectedValue);
+      return selectedItem ? selectedItem.label.replace(/^\d+\.\s*/, '') : '';
   }, [selectedValue, items]);
+
+  const handleSelect = (value: string) => {
+    onSelect(value);
+    setQuery('');
+    setIsOpen(false);
+  };
+
+  // Garante que o inputClassName seja aplicado no input
+  const inputClasses = inputClassName || "w-full p-3 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500";
+  // Adicione p-4 e text-lg manualmente para garantir o tamanho
+  const finalInputClasses = `${inputClasses} p-4 text-lg`;
+
 
   return (
     <div className="relative z-10 w-full"> 
-      <Combobox value={selectedValue} onChange={onSelect}>
-        <Combobox.Label className="block text-sm font-medium text-gray-400 mb-1">
-          {label}
-        </Combobox.Label>
-        <div className="relative">
-          <Combobox.Input
-            // CORREÇÃO: Aplicar as classes de tamanho p-4 e text-lg 
-            // e garantir que a cor do texto do placeholder esteja correta
-            className={inputClassName || "w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out placeholder-gray-400"} 
-            displayValue={() => displayValue}
-            onChange={(event) => setQuery(event.target.value)}
+        <label className="block text-sm font-medium text-gray-400 mb-1">{label}</label>
+        
+        {/* Input de Busca (Onde o usuário digita) */}
+        <input
+            type="text"
+            // Exibe a busca ou o valor selecionado
+            value={query || selectedLabel}
+            onChange={(e) => {
+                setQuery(e.target.value);
+                setIsOpen(true);
+                // Limpa a seleção ao começar a digitar
+                if (e.target.value === '') onSelect(''); 
+            }}
+            onFocus={() => setIsOpen(true)}
+            // Pequeno delay para permitir o clique antes de fechar
+            onBlur={() => setTimeout(() => setIsOpen(false), 200)} 
             placeholder="Digite para buscar o jogador..."
-          />
-          <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-          </Combobox.Button>
-        </div>
-        <Transition
-          as={Fragment}
-          leave="transition ease-in duration-100"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-          afterLeave={() => setQuery('')}
-        >
-          <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm custom-scrollbar z-50">
-            {filteredItems.length === 0 && query !== '' ? (
-              <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
+            // APLICAMOS AS NOVAS CLASSES DE TAMANHO AQUI
+            className={finalInputClasses}
+        />
+
+        {/* Dropdown de Resultados (Usando HTML/Tailwind simples) */}
+        {isOpen && filteredItems.length > 0 && (
+            <div className="absolute w-full mt-1 max-h-60 overflow-y-auto bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
+                {filteredItems.map(item => (
+                    <div
+                        key={item.value}
+                        onMouseDown={() => handleSelect(item.value)} 
+                        className={`p-3 text-sm cursor-pointer hover:bg-gray-700 ${item.value === selectedValue ? 'bg-gray-700 text-green-500' : 'text-gray-300'} ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {item.label}
+                    </div>
+                ))}
+            </div>
+        )}
+         {isOpen && filteredItems.length === 0 && query !== '' && (
+              <div className="absolute w-full mt-1 p-3 text-sm text-gray-400 bg-gray-800 rounded-lg border border-gray-700">
                 Nenhum jogador encontrado.
               </div>
-            ) : (
-              filteredItems.map((item) => (
-                <Combobox.Option
-                  key={item.value}
-                  className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                      active ? 'bg-green-600 text-white' : 'text-gray-200'
-                    } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`
-                  }
-                  value={item.value}
-                  disabled={item.disabled}
-                >
-                  {({ selected, active }) => (
-                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                        {item.label}
-                    </span>
-                  )}
-                </Combobox.Option>
-              ))
-            )}
-          </Combobox.Options>
-        </Transition>
-      </Combobox>
+         )}
     </div>
   );
 }
