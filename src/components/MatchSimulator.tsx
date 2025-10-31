@@ -1,10 +1,10 @@
 // Em: src/components/MatchSimulator.tsx
 
-import React, { useState, useMemo } from 'react'; // <--- IMPORTA O REACT AQUI!
-import { ComboboxSearch } from './ComboboxSearch'; 
+import React, { useState, useMemo } from 'react';
+import { ComboboxSearch } from './ComboboxSearch'; // Assume que você tem o ComboboxSearch.tsx
+import { toast } from 'sonner'; // Para exibir mensagens de erro, se necessário
 
-// (Mantenha todos os Types: JogadorElo, SimulationData, SimulatorProps)
-// ...
+// --- TIPOS DE DADOS ESTRUTURAIS ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -18,24 +18,29 @@ export type SimulationData = {
   elo2: number;
   odds2: number;
 };
+
+// --- NOVAS PROPS PARA O SIMULATOR ---
 type SimulatorProps = {
   ranking: JogadorElo[];
-  onSimulate: (data: SimulationData) => void;
   isLoading: boolean;
+  
+  playerNumber: 1 | 2; // Qual jogador é este componente?
+  selectedPlayer: string;
+  onSelectPlayer: (value: string) => void; // setState do Jogador
+  odds: string;
+  onSetOdds: (value: string) => void;       // setState das Odds
+  otherPlayerValue: string; // Valor do outro jogador para desabilitar
 };
 
 
-// --- NOVA FUNÇÃO DE FILTRO (Adicione isto) ---
+// --- FUNÇÃO DE FILTRO (essencial para evitar o bug de foco) ---
 const filterOddsValue = (value: string) => value.replace(/[^0-9.,]/g, '');
 
-
-// --- DEFINIÇÃO DO INPUT (Com React.memo para evitar a perda de foco) ---
-// Note que ela é declarada ANTES do export function MatchSimulator
+// --- INPUT PADRÃO (Corrigido com type="tel" e React.memo) ---
 const InputDark = React.memo((props: { value: string, onChange: (e: any) => void, placeholder: string, label: string }) => {
     
-    // Essa função apenas repassa o evento, mas o React.memo previne re-renders desnecessários.
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        props.onChange(e); 
+        props.onChange(e); // Apenas repassa o evento, a filtragem acontece no componente pai.
     };
     
     return (
@@ -45,7 +50,7 @@ const InputDark = React.memo((props: { value: string, onChange: (e: any) => void
                 type="tel" 
                 inputMode="decimal" 
                 value={props.value}
-                onChange={handleChange} // Usa o handleChange simples
+                onChange={handleChange} 
                 placeholder={props.placeholder}
                 className="w-full p-3 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
                 required
@@ -55,115 +60,83 @@ const InputDark = React.memo((props: { value: string, onChange: (e: any) => void
 });
 
 
-// --- COMPONENTE PRINCIPAL ---
-export function MatchSimulator({ ranking, onSimulate, isLoading }: SimulatorProps) {
-    // ... (restante do MatchSimulator.tsx)
-    const [selectedPlayer1, setSelectedPlayer1] = useState<string>(''); 
-    const [selectedPlayer2, setSelectedPlayer2] = useState<string>(''); 
-    const [odds1, setOdds1] = useState<string>('');
-    const [odds2, setOdds2] = useState<string>('');
+// --- COMPONENTE MATCH SIMULATOR (ADAPTADO) ---
+export function MatchSimulator({ 
+  ranking, 
+  isLoading,
+  playerNumber,
+  selectedPlayer,
+  onSelectPlayer,
+  odds,
+  onSetOdds,
+  otherPlayerValue,
+}: SimulatorProps) {
+  
+  // Prepara a lista de jogadores no formato que o Combobox entende
+  const playerItems = useMemo(() => ranking.map(jogador => ({
+    value: `${jogador.nome}|${jogador.elo}`,
+    label: `${jogador.rank}. ${jogador.nome} (${jogador.elo} Elo)`,
+  })), [ranking]);
 
-    // Prepara a lista de jogadores no formato que o Combobox entende
-    const playerItems = useMemo(() => ranking.map(jogador => ({
-        value: `${jogador.nome}|${jogador.elo}`,
-        label: `${jogador.rank}. ${jogador.nome} (${jogador.elo} Elo)`,
-    })), [ranking]);
+
+  // Lógica para desabilitar o jogador já selecionado no outro Combobox
+  const filteredPlayerItems = useMemo(() => {
+    return playerItems.map(item => ({
+      ...item,
+      disabled: item.value === otherPlayerValue
+    }));
+  }, [playerItems, otherPlayerValue, playerItems]);
 
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+  // Extrair o Elo do jogador selecionado para exibição
+  const eloDisplay = useMemo(() => {
+    if (selectedPlayer) {
+      const parts = selectedPlayer.split('|');
+      return parts.length > 1 ? `ELO: ${parts[1]}` : 'ELO: ????';
+    }
+    return 'ELO: ????';
+  }, [selectedPlayer]);
 
-        if (!selectedPlayer1 || !selectedPlayer2 || !odds1 || !odds2 || selectedPlayer1 === selectedPlayer2) {
-            alert('Preencha todos os campos e selecione jogadores diferentes.');
-            return;
-        }
 
-        // 1. DESESTRUTURAR OS DADOS DOS JOGADORES
-        const [nome1, elo1] = selectedPlayer1.split('|');
-        const [nome2, elo2] = selectedPlayer2.split('|');
+  const playerTitle = playerNumber === 1 ? 'JOGADOR 1' : 'JOGADOR 2';
+  const playerColor = playerNumber === 1 ? 'text-green-500' : 'text-indigo-400';
 
-        // 2. TRATAMENTO DAS ODDS (substitui vírgula por ponto)
-        const rawOdds1 = odds1.replace(',', '.');
-        const rawOdds2 = odds2.replace(',', '.');
+  return (
+    <div className="p-4 rounded-xl border border-gray-700 text-gray-100 shadow-lg space-y-5 bg-gray-800/80"> 
+      
+      {/* Título do Jogador */}
+      <h3 className={`text-xl font-extrabold text-center uppercase tracking-wide ${playerColor}`}>
+        {playerTitle}
+      </h3>
 
-        // 3. VALIDAÇÃO DE NÚMEROS (IMPORTANTE!)
-        const parsedOdds1 = parseFloat(rawOdds1);
-        const parsedOdds2 = parseFloat(rawOdds2);
-        const parsedElo1 = parseFloat(elo1);
-        const parsedElo2 = parseFloat(elo2);
-        
-        if (isNaN(parsedOdds1) || isNaN(parsedOdds2) || isNaN(parsedElo1) || isNaN(parsedElo2)) {
-            alert('Erro na conversão dos números. Verifique o formato das Odds (use ponto ou vírgula).');
-            return;
-        }
+      {/* Combobox de Seleção de Jogador */}
+      <ComboboxSearch
+          label="NOME DO JOGADOR"
+          items={filteredPlayerItems}
+          selectedValue={selectedPlayer}
+          onSelect={onSelectPlayer}
+      />
+      
+      {/* Input de Odds */}
+      <InputDark 
+          value={odds} 
+          // O setOdds chama a função de filtro
+          onChange={(e) => onSetOdds(filterOddsValue(e.target.value))} 
+          placeholder="Ex: 1.85" 
+          label="ODDS DA APOSTA"
+      />
 
-        // 4. ENVIO DE DADOS
-        onSimulate({
-            player1: nome1,
-            elo1: parsedElo1,
-            odds1: parsedOdds1,
-            player2: nome2,
-            elo2: parsedElo2,
-            odds2: parsedOdds2,
-        });
-    };
-    
-    return (
-        <div className="p-8 bg-gray-800 rounded-xl border border-gray-700 text-gray-100 shadow-none">
-            {/* ... (restante do JSX) ... */}
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-                
-                {/* --- Jogador A --- */}
-                <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-200 mb-4"> Jogador 1</h3>
-                    <ComboboxSearch
-                        label="Nome do jogador"
-                        items={playerItems}
-                        selectedValue={selectedPlayer1}
-                        onSelect={setSelectedPlayer1}
-                    />
-                    <InputDark 
-                        value={odds1} 
-                        // CHAMA A FUNÇÃO DE FILTRO AO ATUALIZAR O ESTADO
-                        onChange={(e) => setOdds1(filterOddsValue(e.target.value))} 
-                        placeholder="Ex: 1.85" 
-                        label="Odd Jogador 1"
-                    />
-                </div>
-                
-                {/* ... (Separador VS) ... */}
-                <div className="text-center py-2 text-sm font-medium text-gray-500">
-                    — VS —
-                </div>
+      {/* Exibição do ELO */}
+      <div className="text-center pt-2 text-gray-400 font-bold text-sm border-t border-gray-700">
+        {eloDisplay}
+      </div>
 
-                {/* --- Jogador B --- */}
-                <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-200 mb-4"> Jogador 2</h3>
-                    <ComboboxSearch
-                        label="Nome do jogador"
-                        items={playerItems}
-                        selectedValue={selectedPlayer2}
-                        onSelect={setSelectedPlayer2}
-                    />
-                    <InputDark 
-                        value={odds2} 
-                        // CHAMA A FUNÇÃO DE FILTRO AO ATUALIZAR O ESTADO
-                        onChange={(e) => setOdds2(filterOddsValue(e.target.value))} 
-                        placeholder="Ex: 2.10" 
-                        label="Odd Jogador 2"
-                    />
-                </div>
-                
-                {/* ... (Botão) ... */}
-                <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-xl hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-md mt-6"
-                >
-                {isLoading ? 'Aguarde...' : 'Simular'}
-                </button>
-            </form>
-        </div>
-    );
+      {/* Exibição do Loading (opcional) */}
+      {isLoading && (
+          <div className="text-center text-sm text-yellow-400">
+              Aguarde, calculando...
+          </div>
+      )}
+    </div>
+  );
 }
