@@ -1,11 +1,11 @@
-// Em: src/pages/Index.tsx
+// Em: src/pages/Index.tsx (VERSÃO MINIMALISTA: SEM QUADRA, SÓ FORMULÁRIO)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
-import { TennisCourt } from "../components/TennisCourt";
+// REMOVIDO: import { TennisCourt } from "../components/TennisCourt";
 import { toast } from "sonner"; 
 
-// --- TIPOS DE DADOS ESTRUTURAIS ---
+// --- TIPOS DE DADOS ESTRUTURAIS (Mantidas) ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -69,7 +69,7 @@ const Index = (): JSX.Element => {
 
   useEffect(() => {
     fetchRanking();
-    document.title = "Tennis Match Predictor | Elo Advisor";
+    document.title = "Simulador de Confrontos no Tênis (By ELo)"; // NOVO TÍTULO
   }, [fetchRanking]);
 
   // --- LÓGICA DE SIMULAÇÃO ---
@@ -113,8 +113,8 @@ const Index = (): JSX.Element => {
     });
   };
   
-  // --- FUNÇÃO PARA RENDERIZAR RESULTADOS FLUTUANTES ---
-  const renderFloatingResults = useMemo(() => {
+  // --- FUNÇÃO PARA RENDERIZAR RESULTADOS FLUTUANTES (Agora fixos) ---
+  const renderResults = useMemo(() => {
     if (!simulationResult) return null;
 
     const { ev1, ev2 } = simulationResult;
@@ -123,7 +123,7 @@ const Index = (): JSX.Element => {
     const EvCard = ({ player, ev, isBest }: { player: string, ev: number, isBest: boolean }) => {
         const colorClass = ev >= 5 ? 'text-green-400' : ev > 0 ? 'text-yellow-400' : 'text-red-400';
         return (
-            <div className={`p-3 rounded-lg text-center ${isBest ? 'bg-gray-700/80 border border-indigo-400' : 'bg-gray-700/50'} pointer-events-auto`}>
+            <div className={`p-3 rounded-lg text-center ${isBest ? 'bg-gray-700/80 border border-indigo-400' : 'bg-gray-700/50'}`}>
                 <p className="text-sm font-medium text-gray-400">{player}</p>
                 <p className={`text-xl font-bold ${colorClass}`}>{ev.toFixed(2)}% EV</p>
             </div>
@@ -131,22 +131,19 @@ const Index = (): JSX.Element => {
     };
 
     return (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-            {/* Resultados de EV Flutuando (Superior Esquerdo e Direito) */}
-            <div className="absolute top-20 left-10">
+        <div className="mt-8 pt-4 border-t border-gray-700 w-full">
+            <h3 className="text-2xl font-bold text-center mb-4">Resultado da Análise</h3>
+            <div className="flex justify-center space-x-8">
                 <EvCard player={simulationResult.player1} ev={ev1} isBest={isPlayer1Value} />
-            </div>
-            <div className="absolute top-20 right-10">
                 <EvCard player={simulationResult.player2} ev={ev2} isBest={!isPlayer1Value} />
             </div>
-
-            {/* Recomendação Final Flutuando no Meio */}
-            <div className="absolute bottom-10 w-3/4 max-w-sm p-4 bg-indigo-900/70 border border-indigo-400 rounded-lg pointer-events-auto">
-                <p className="text-sm font-semibold text-indigo-200">Recomendação:</p>
+            
+            <div className="mt-6 p-4 bg-indigo-900/70 border border-indigo-400 rounded-lg text-center">
+                <p className="text-sm font-semibold text-indigo-200">Conclusão:</p>
                 <p className="text-base text-white mt-1">{simulationResult.recommendation}</p>
                 <button 
                   onClick={() => setSimulationResult(null)}
-                  className="mt-2 text-xs text-indigo-300 hover:text-indigo-100 font-medium"
+                  className="mt-2 text-sm text-indigo-300 hover:text-indigo-100 font-medium"
                 >
                   (Nova Análise)
                 </button>
@@ -156,16 +153,17 @@ const Index = (): JSX.Element => {
   }, [simulationResult]);
 
 
-  // --- RENDERIZAÇÃO PRINCIPAL (O JSX) ---
+  // --- RENDERIZAÇÃO PRINCIPAL ---
   if (isFetchingRanking) {
     return (
       <div className="min-h-screen bg-gray-950 text-gray-100 flex items-center justify-center">
-        <p className="text-xl">Carregando rankings e preparando a quadra...</p>
+        <p className="text-xl">Carregando rankings e preparando o simulador...</p>
       </div>
     );
   }
 
   return (
+    // Max-w-3xl para centralizar o formulário em telas grandes
     <div className="min-h-screen bg-gray-950 text-gray-100 relative overflow-hidden flex flex-col items-center"> 
       
       {/* Círculo de Degrade Verde (Mantém) */}
@@ -176,80 +174,55 @@ const Index = (): JSX.Element => {
       {/* Título Principal no Topo */}
       <div className="w-full text-center py-8 relative z-10">
         <h1 className="text-4xl font-extrabold text-white uppercase tracking-wider">
-          Tennis Match Predictor
+          TENNIS MATCH PREDICTOR
         </h1>
+        <p className="text-lg font-semibold text-gray-400 mt-2">
+          Simulador de Confrontos no Tênis (By ELo)
+        </p>
       </div>
 
-      {/* Container Principal: Jogadores + Quadra */}
-      <div className="container mx-auto py-4 relative z-10 flex items-start justify-center flex-grow max-w-full px-0">
+      {/* CONTAINER PRINCIPAL: Jogadores e Botão (Minimalista) */}
+      <div className="container mx-auto py-4 relative z-10 flex flex-col items-center flex-grow max-w-4xl px-4">
         
-        {/* Coluna da Esquerda (Simulador Jogador 1) - MUDANÇA: max-w-sm */}
-        <div className="flex-1 min-w-0 mr-8 mt-12 self-start max-w-sm"> 
-           <MatchSimulator
-              ranking={ranking} isLoading={isLoading} playerNumber={1}
-              selectedPlayer={selectedPlayer1} onSelectPlayer={setSelectedPlayer1}
-              odds={odds1} onSetOdds={setOdds1} otherPlayerValue={selectedPlayer2}
-           />
+        {/* CAIXAS LATERAIS (Lado a Lado) */}
+        <div className="flex w-full justify-center space-x-8">
+            
+            {/* Jogador 1 (Esquerda) */}
+            <div className="flex-1 max-w-xs"> 
+              <MatchSimulator
+                  ranking={ranking} isLoading={isLoading} playerNumber={1}
+                  selectedPlayer={selectedPlayer1} onSelectPlayer={setSelectedPlayer1}
+                  odds={odds1} onSetOdds={setOdds1} otherPlayerValue={selectedPlayer2}
+              />
+            </div>
+
+            {/* Jogador 2 (Direita) */}
+            <div className="flex-1 max-w-xs">
+              <MatchSimulator
+                  ranking={ranking} isLoading={isLoading} playerNumber={2}
+                  selectedPlayer={selectedPlayer2} onSelectPlayer={setSelectedPlayer2}
+                  odds={odds2} onSetOdds={setOdds2} otherPlayerValue={selectedPlayer1}
+              />
+            </div>
+            
         </div>
 
-        {/* Quadra de Tênis no Centro (MAXIMIZADO) */}
-        <div className="flex-shrink-0 relative w-full max-w-5xl"> 
-          
-          <TennisCourt />
-          
-          {/* Barra de Probabilidade (Posicionada na Quadra) */}
-          {simulationResult && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4/5">
-              <h4 className="text-lg font-semibold text-gray-300 mb-2 text-center">
-                Probabilidade de Vitória (Elo)
-              </h4>
-              <div className="flex w-full h-8 rounded-lg overflow-hidden shadow-inner">
-                {/* Barra do Jogador 1 */}
-                <div 
-                  style={{ width: `${simulationResult.prob1}%` }} 
-                  className="h-full bg-green-500 flex items-center justify-center transition-all duration-700"
-                >
-                  <span className="text-xs font-bold text-gray-900">{simulationResult.prob1.toFixed(1)}%</span>
-                </div>
-                {/* Barra do Jogador 2 */}
-                <div 
-                  style={{ width: `${simulationResult.prob2}%` }} 
-                  className="h-full bg-blue-500 flex items-center justify-center transition-all duration-700"
-                >
-                  <span className="text-xs font-bold text-gray-900">{simulationResult.prob2.toFixed(1)}%</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Botão CALCULATE PROBABILITY (Posição central inferior) */}
-          <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 z-20"> 
+        {/* Botão CALCULATE PROBABILITY (Centralizado) */}
+        <div className="mt-8 w-full max-w-lg text-center"> 
              <button
                 type="button"
-                className="w-72 px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-full hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-xl"
+                className="w-full px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-xl hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-xl"
                 onClick={handleCentralButtonClick}
                 disabled={isLoading || !selectedPlayer1 || !selectedPlayer2 || !odds1 || !odds2}
              >
                 {isLoading ? 'CALCULANDO...' : 'CALCULATE PROBABILITY'}
              </button>
-          </div>
-          
         </div>
-
-        {/* Coluna da Direita (Simulador Jogador 2) - MUDANÇA: max-w-sm */}
-        <div className="flex-1 min-w-0 ml-8 mt-12 self-start max-w-sm">
-          <MatchSimulator
-              ranking={ranking} isLoading={isLoading} playerNumber={2}
-              selectedPlayer={selectedPlayer2} onSelectPlayer={setSelectedPlayer2}
-              odds={odds2} onSetOdds={setOdds2} otherPlayerValue={selectedPlayer1}
-          />
-        </div>
+        
+        {/* Área de Resultados */}
+        {renderResults}
 
       </div>
-      
-      {/* Resultados Flutuantes (EV e Recomendação) */}
-      {renderFloatingResults}
-
     </div>
   );
 };
