@@ -1,4 +1,4 @@
-// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA: LARGURA SIMÉTRICA)
+// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA: LAYOUT E ESTABILIDADE)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
@@ -64,7 +64,8 @@ const Index = (): JSX.Element => {
       const response = await fetch('/api/ranking-semanal');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      setRanking(data.ranking || []);
+      // GARANTIA: Verifica se 'ranking' existe antes de setar
+      setRanking(data.ranking || []); 
     } catch (error) {
       console.error("Erro ao buscar o ranking:", error);
       toast.error("Erro ao carregar o ranking inicial. Verifique a API.");
@@ -186,7 +187,6 @@ const Index = (): JSX.Element => {
       </div>
 
       {/* CONTAINER PRINCIPAL: GRID 3 COLUNAS FIXAS */}
-      {/* Colunas: [ Tabela (400px) | Formulários (auto) | Espaço (auto) ] */}
       <div className="container mx-auto py-4 relative z-10 grid grid-cols-[400px_1fr_1fr] gap-x-8 items-start max-w-6xl px-4">
         
         {/* 1. COLUNA ESQUERDA: TABELA TOP 25 (Largura Fixa de 400px) */}
@@ -197,13 +197,12 @@ const Index = (): JSX.Element => {
         </div>
 
         {/* 2. COLUNA CENTRAL (FORMULÁRIOS LADO A LADO) */}
-        {/* Ocupa o espaço central restante (1fr) */}
         <div className="col-span-1 flex flex-col items-center mt-4 w-full">
             
             {/* LINHA 1: JOGADOR 1 e JOGADOR 2 LADO A LADO */}
             <div className="flex w-full justify-center space-x-8">
                 
-                {/* JOGADOR 1 (Esquerda) - Ajustado para usar flex-1 e min-w-0 */}
+                {/* JOGADOR 1 (Esquerda) */}
                 <div className="flex-1 min-w-0"> 
                   <MatchSimulator
                       ranking={ranking} isLoading={isLoading} playerNumber={1}
@@ -212,7 +211,7 @@ const Index = (): JSX.Element => {
                   />
                 </div>
 
-                {/* JOGADOR 2 (Direita) - Ajustado para usar flex-1 e min-w-0 */}
+                {/* JOGADOR 2 (Direita) */}
                 <div className="flex-1 min-w-0">
                   <MatchSimulator
                       ranking={ranking} isLoading={isLoading} playerNumber={2}
@@ -249,4 +248,4 @@ const Index = (): JSX.Element => {
   );
 };
 
-export default Index;
+export default Index
