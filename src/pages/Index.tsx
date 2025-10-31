@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
-// REMOVIDA: import { TennisCourt } from "../components/TennisCourt";
+import { Top25Ranking } from "../components/Top25Ranking"; // NOVO
+import { ParticleBackground } from "../components/ParticleBackground"; // NOVO
 import { toast } from "sonner"; 
 
 // --- TIPOS DE DADOS ESTRUTURAIS ---
@@ -38,11 +39,6 @@ const getRecommendation = (ev1: number, ev2: number, player1: string, player2: s
 
 // --- COMPONENTE PRINCIPAL (PÁGINA) ---
 const Index = (): JSX.Element => { 
-  // --- ESTADOS DE DETECÇÃO DE TEMA ---
-  const [theme, setTheme] = useState<'day' | 'night'>('night');
-  const HORA_INICIO_DIA = 7;     // 7:00 AM
-  const HORA_INICIO_NOITE = 19;  // 7:00 PM (19:00)
-
   // --- ESTADOS DE DADOS DA APLICAÇÃO ---
   const [ranking, setRanking] = useState<JogadorElo[]>([]); 
   const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null);
@@ -55,32 +51,6 @@ const Index = (): JSX.Element => {
   // ESTADOS DE CONTROLE
   const [isLoading, setIsLoading] = useState<boolean>(false); 
   const [isFetchingRanking, setIsFetchingRanking] = useState<boolean>(true);
-
-  // --- LÓGICA DE DETECÇÃO DE TEMA (CORRIGIDA) ---
-  useEffect(() => {
-    const updateTheme = () => {
-      const currentHour = new Date().getHours();
-      
-      // Ajuste o horário baseado no seu fuso horário (Maringá/BR -03:00)
-      if (currentHour >= HORA_INICIO_DIA && currentHour < HORA_INICIO_NOITE) {
-        setTheme('day');
-      } else {
-        setTheme('night');
-      }
-    };
-
-    updateTheme(); 
-    const intervalId = setInterval(updateTheme, 60 * 60 * 1000); 
-    
-    return () => clearInterval(intervalId);
-  }, []); 
-
-  // Variáveis CSS Dinâmicas (dependem do tema)
-  const backgroundClass = theme === 'night' 
-    ? 'bg-gray-950 text-gray-100' // Noite: Fundo mais escuro
-    : 'bg-blue-100 text-gray-900'; // Dia: Fundo claro/azul
-  
-  const headerColor = theme === 'night' ? 'text-white' : 'text-gray-800';
 
 
   // --- FETCH RANKING ---
@@ -101,7 +71,7 @@ const Index = (): JSX.Element => {
 
   useEffect(() => {
     fetchRanking();
-    document.title = "Simulador de Confrontos no Tênis (By ELo)"; // Título Corrigido
+    document.title = "Simulador de Confrontos no Tênis (By ELo)";
   }, [fetchRanking]);
 
   // --- LÓGICA DE SIMULAÇÃO e BOTÃO CENTRAL ---
@@ -144,7 +114,7 @@ const Index = (): JSX.Element => {
     });
   };
   
-  // --- FUNÇÃO PARA RENDERIZAR RESULTADOS FLUTUANTES (Mantida) ---
+  // --- FUNÇÃO PARA RENDERIZAR RESULTADOS (Mantida) ---
   const renderFloatingResults = useMemo(() => {
     if (!simulationResult) return null;
 
@@ -194,26 +164,20 @@ const Index = (): JSX.Element => {
   }
 
   return (
-    // APLICA O TEMA DINÂMICO AQUI
-    <div className={`min-h-screen ${backgroundClass} relative overflow-hidden flex flex-col items-center`}> 
+    // DARK MODE FIXO
+    <div className="min-h-screen bg-gray-950 text-gray-100 relative overflow-hidden flex flex-col items-center"> 
       
-      {/* Círculo de Degrade Verde (Apenas para o Night Mode - opcional) */}
-      <div className="absolute top-0 left-0 w-96 h-96 blur-3xl opacity-30 z-0 pointer-events-none">
+      {/* 1. FUNDO INTERATIVO: z-0 para ficar no fundo */}
+      <ParticleBackground />
+      
+      {/* Círculo de Degrade Verde (Fixo - z-10) */}
+      <div className="absolute top-0 left-0 w-96 h-96 blur-3xl opacity-30 z-10 pointer-events-none">
           <div className="w-full h-full rounded-full bg-green-500/50 transform translate-x-[-50%] translate-y-[-50%]"></div>
       </div>
       
-      {/* Estrelas (Apenas no modo Noturno) */}
-      {theme === 'night' && (
-          <div className="absolute inset-0 z-0 pointer-events-none" style={{ 
-              backgroundImage: 'radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px), radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px), radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px)',
-              backgroundSize: '550px 550px, 350px 350px, 250px 250px',
-              backgroundPosition: '0 0, 40px 60px, 130px 270px'
-          }}></div>
-      )}
-      
-      {/* Título Principal no Topo */}
-      <div className="w-full text-center py-8 relative z-10">
-        <h1 className={`text-4xl font-extrabold uppercase tracking-wider ${headerColor}`}>
+      {/* Título Principal no Topo (z-20 para ficar acima de tudo) */}
+      <div className="w-full text-center py-8 relative z-20">
+        <h1 className="text-4xl font-extrabold text-white uppercase tracking-wider">
           TENNIS MATCH PREDICTOR
         </h1>
         <p className="text-lg font-semibold text-gray-400 mt-2">
@@ -221,10 +185,10 @@ const Index = (): JSX.Element => {
         </p>
       </div>
 
-      {/* CONTAINER PRINCIPAL: Jogadores e Botão (Minimalista) */}
-      <div className="container mx-auto py-4 relative z-10 flex flex-col items-center flex-grow max-w-4xl px-4">
+      {/* CONTAINER PRINCIPAL (z-20) */}
+      <div className="container mx-auto py-4 relative z-20 flex flex-col items-center flex-grow max-w-4xl px-4">
         
-        {/* CAIXAS LATERAIS (Lado a Lado) - REVERSÃO TOTAL PARA DUAS COLUNAS */}
+        {/* CAIXAS LATERAIS (Lado a Lado) */}
         <div className="flex w-full justify-center space-x-8">
             
             {/* Jogador 1 (Esquerda) */}
@@ -261,6 +225,13 @@ const Index = (): JSX.Element => {
         
         {/* Área de Resultados */}
         {renderFloatingResults}
+
+        {/* 2. TABELA DE RANKING (ABAixo do Formulário/Resultados) */}
+        {ranking.length > 0 && (
+            <div className="w-full max-w-xl mt-12 mb-12">
+                <Top25Ranking ranking={ranking} />
+            </div>
+        )}
 
       </div>
     </div>
