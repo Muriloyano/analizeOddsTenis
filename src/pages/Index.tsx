@@ -1,12 +1,12 @@
-// Em: src/pages/Index.tsx (VERSÃO FINAL COM CORREÇÃO DE ROTEAMENTO REACT-ROUTER-DOM)
+// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA: LAYOUT E NAVEGAÇÃO)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
 import { Top25Ranking } from "../components/Top25Ranking"; 
 import { toast } from "sonner"; 
-import { useNavigate } from 'react-router-dom'; // <-- CORREÇÃO APLICADA AQUI
+import { useNavigate } from 'react-router-dom'; // CORREÇÃO: Uso do useNavigate
 
-// --- TIPOS DE DADOS ESTRUTURAIS (Mantidos) ---
+// --- TIPOS DE DADOS ESTRUTURAIS ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -15,6 +15,7 @@ type JogadorElo = {
 type AnalysisResult = {
   player1: string; player2: string; elo1: number; elo2: number; prob1: number; prob2: number; ev1: number; ev2: number; odds1: number; odds2: number; recommendation: string;
 };
+
 // --- FUNÇÕES DE CÁLCULO (Mantidas) ---
 const calculateEloProbs = (elo1: number, elo2: number): { prob1: number, prob2: number } => {
   const eloDiff = elo1 - elo2;
@@ -38,11 +39,11 @@ const getRecommendation = (ev1: number, ev2: number, player1: string, player2: s
 
 // --- COMPONENTE PRINCIPAL (PÁGINA) ---
 const Index = (): JSX.Element => { 
-  const navigate = useNavigate(); // <-- USO CORRETO DO HOOK DE NAVEGAÇÃO
+  const navigate = useNavigate(); // Uso correto do hook
 
   // --- ESTADOS DE DADOS DA APLICAÇÃO ---
   const [ranking, setRanking] = useState<JogadorElo[]>([]); 
-  const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null); // Mantido
+  const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null);
   
   const [selectedPlayer1, setSelectedPlayer1] = useState<string>(''); 
   const [selectedPlayer2, setSelectedPlayer2] = useState<string>(''); 
@@ -95,7 +96,7 @@ const Index = (): JSX.Element => {
         odds1: data.odds1, odds2: data.odds2, recommendation: recommendation,
       };
 
-      // NAVEGAÇÃO CORRIGIDA: Passa os dados via state para a rota /results
+      // NAVEGAÇÃO: Passa os dados via state para a rota /results
       navigate('/results', { state: { result } });
 
     } catch (error) {
@@ -104,8 +105,7 @@ const Index = (): JSX.Element => {
     } finally {
       setIsLoading(false);
     }
-  }, [navigate]); // navigate deve ser dependência
-
+  }, [navigate]); 
 
   const handleCentralButtonClick = () => {
     if (!selectedPlayer1 || !selectedPlayer2 || !odds1 || !odds2 || selectedPlayer1 === selectedPlayer2) {
@@ -123,10 +123,12 @@ const Index = (): JSX.Element => {
     });
   };
   
-  // --- FUNÇÃO PARA RENDERIZAR RESULTADOS (Mantida) ---
+  // --- FUNÇÃO PARA RENDERIZAR RESULTADOS (Simplificada para o novo layout) ---
   const renderFloatingResults = useMemo(() => {
+    // ... (Apenas mostra resultados, sem a complexidade de layout flutuante)
     if (!simulationResult) return null;
-    // ... (Lógica do renderFloatingResults - Mantida) ...
+    
+    // ... (Lógica do EvCard e renderização dos resultados) ...
     const { ev1, ev2 } = simulationResult;
     const isPlayer1Value = ev1 > ev2; 
 
@@ -141,22 +143,11 @@ const Index = (): JSX.Element => {
     };
 
     return (
-        <div className="mt-8 pt-4 border-t border-gray-700 w-full">
+        <div className="mt-8 pt-4 border-t border-gray-700 w-full max-w-6xl">
             <h3 className="text-2xl font-bold text-center mb-4">Resultado da Análise</h3>
             <div className="flex justify-center space-x-8">
                 <EvCard player={simulationResult.player1} ev={ev1} isBest={isPlayer1Value} />
                 <EvCard player={simulationResult.player2} ev={ev2} isBest={!isPlayer1Value} />
-            </div>
-            
-            <div className="mt-6 p-4 bg-indigo-900/70 border border-indigo-400 rounded-lg text-center">
-                <p className="text-sm font-semibold text-indigo-200">Conclusão:</p>
-                <p className="text-base text-white mt-1">{simulationResult.recommendation}</p>
-                <button 
-                  onClick={() => setSimulationResult(null)}
-                  className="mt-2 text-sm text-indigo-300 hover:text-indigo-100 font-medium"
-                >
-                  (Nova Análise)
-                </button>
             </div>
         </div>
     );
@@ -207,7 +198,7 @@ const Index = (): JSX.Element => {
             <div className="flex w-full justify-center space-x-8">
                 
                 {/* JOGADOR 1 (Esquerda) */}
-                <div className="flex-1 min-w-0"> 
+                <div className="flex-1 w-full"> 
                   <MatchSimulator
                       ranking={ranking} isLoading={isLoading} playerNumber={1}
                       selectedPlayer={selectedPlayer1} onSelectPlayer={setSelectedPlayer1}
@@ -216,7 +207,7 @@ const Index = (): JSX.Element => {
                 </div>
 
                 {/* JOGADOR 2 (Direita) */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 w-full">
                   <MatchSimulator
                       ranking={ranking} isLoading={isLoading} playerNumber={2}
                       selectedPlayer={selectedPlayer2} onSelectPlayer={setSelectedPlayer2}

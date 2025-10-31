@@ -1,4 +1,4 @@
-// Em: src/components/MatchSimulator.tsx (Substitua todo o conteúdo)
+// Em: src/components/MatchSimulator.tsx (CORREÇÃO FINAL DO INPUT)
 
 import React, { useMemo } from 'react';
 import { ComboboxSearch } from './ComboboxSearch'; 
@@ -48,8 +48,8 @@ const InputDark = React.memo((props: { value: string, onChange: (e: any) => void
                 value={props.value}
                 onChange={handleChange} 
                 placeholder={props.placeholder}
-                // CORREÇÃO: p-4 para caixa de texto maior e text-lg para o texto interno
-                className="w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
+                // CORREÇÃO: p-4 e text-lg para tornar a caixa maior e o texto mais visível
+                className="w-full p-4 text-lg bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
                 required
             />
         </div>
@@ -93,7 +93,6 @@ export function MatchSimulator({
 
 
   return (
-    // CORREÇÃO: Adicionado w-full para preencher a largura disponível
     <div className="p-6 bg-gray-800/80 rounded-xl border border-gray-700 text-gray-100 shadow-xl space-y-5 w-full"> 
       
       {/* Título do Jogador */}
@@ -107,8 +106,8 @@ export function MatchSimulator({
           items={filteredPlayerItems}
           selectedValue={selectedPlayer}
           onSelect={onSelectPlayer}
-          // Passando classes para o input interno do Combobox
-          inputClassName="w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
+          // PASSANDO CLASSE PARA O INPUT INTERNO (Caixa de busca larga)
+          inputClassName="w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out placeholder-gray-400"
       />
       
       {/* 2. INPUT DE ODDS (Caixa de texto maior) */}
