@@ -1,10 +1,10 @@
-// Em: src/components/MatchSimulator.tsx (VERSÃO FINAL E MINIMALISTA)
+// Em: src/components/MatchSimulator.tsx (Inputs Maiores e Estabilidade)
 
 import React, { useMemo } from 'react';
 import { ComboboxSearch } from './ComboboxSearch'; 
 import { toast } from 'sonner';
 
-// --- TIPOS ---
+// --- TIPOS --- (Mantidos)
 type JogadorElo = {
   rank: number;
   nome: string;

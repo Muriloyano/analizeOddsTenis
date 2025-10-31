@@ -16,12 +16,12 @@ export function Top25Ranking({ ranking }: RankingProps) {
     const top25 = ranking.slice(0, 25); 
 
     return (
-        // max-w-full e h-full para maximizar o uso da largura da coluna
+        // Altura h-full para que ela ocupe a altura da coluna e max-w-full
         <div className="bg-gray-800/90 p-4 rounded-xl border border-gray-700 shadow-2xl space-y-4 w-full h-full"> 
             <h3 className="text-xl font-bold text-center text-green-400 uppercase">
                 ATP Elo Ranking (Top 25)
             </h3>
-            {/* Altura h-96 para que ela se estique bem */}
+            {/* Altura fixa (h-96) para o scroll, para alinhar com os formulários */}
             <div className="max-h-96 h-96 overflow-y-auto"> 
                 <table className="w-full text-left text-sm text-gray-400">
                     <thead className="text-xs uppercase bg-gray-700 text-gray-200 sticky top-0">
