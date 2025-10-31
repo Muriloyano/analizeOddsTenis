@@ -1,11 +1,11 @@
-// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA DO LAYOUT)
+// Em: src/pages/Index.tsx (VERSÃO FINAL: TABELA ESQUERDA + FORMULÁRIOS LADO A LADO)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
-import { Top25Ranking } from "../components/Top25Ranking"; // Usado na coluna esquerda
+import { Top25Ranking } from "../components/Top25Ranking"; 
 import { toast } from "sonner"; 
 
-// --- TIPOS DE DADOS ESTRUTURAIS (Mantidos) ---
+// --- TIPOS DE DADOS ESTRUTURAIS ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -78,7 +78,7 @@ const Index = (): JSX.Element => {
     document.title = "Simulador de Confrontos no Tênis (By ELo)";
   }, [fetchRanking]);
 
-  // --- LÓGICA DE SIMULAÇÃO (Mantidas) ---
+  // --- LÓGICA DE SIMULAÇÃO e BOTÃO CENTRAL ---
   const handleSimulate = useCallback((data: SimulationData) => {
     setIsLoading(true);
     try {
@@ -185,60 +185,64 @@ const Index = (): JSX.Element => {
         </p>
       </div>
 
-      {/* CONTAINER PRINCIPAL: TRÊS COLUNAS (Tabela | Formulários Empilhados | Espaço) */}
+      {/* CONTAINER PRINCIPAL: TRÊS PARTES (Tabela | Formulários | Espaço) */}
       <div className="container mx-auto py-4 relative z-10 flex items-start justify-center flex-grow max-w-6xl px-4">
         
         {/* 1. COLUNA ESQUERDA: TABELA TOP 25 (Mais Larga) */}
-        {/* Usamos w-1/3 para que ocupe 1/3 da largura disponível no container central */}
-        <div className="flex-none w-1/3 mr-8"> 
+        <div className="flex-none w-1/3 mr-8 mt-4"> 
           {ranking.length > 0 && (
               <Top25Ranking ranking={ranking} />
           )}
         </div>
 
-        {/* 2. COLUNA CENTRAL: FORMULÁRIOS EMPILHADOS */}
-        {/* Usamos flex-none e max-w-xs para que esta coluna não cresça, mantendo o tamanho das caixas */}
-        <div className="flex-none max-w-xs flex flex-col space-y-6 mt-12">
-          
-          {/* Jogador 1 */}
-          <MatchSimulator
-              ranking={ranking} isLoading={isLoading} playerNumber={1}
-              selectedPlayer={selectedPlayer1} onSelectPlayer={setSelectedPlayer1}
-              odds={odds1} onSetOdds={setOdds1} otherPlayerValue={selectedPlayer2}
-          />
+        {/* 2. COLUNA CENTRAL (FORMULÁRIOS LADO A LADO) */}
+        <div className="flex-none flex flex-col items-center max-w-sm">
+            
+            {/* LINHA 1: JOGADOR 1 e JOGADOR 2 LADO A LADO */}
+            <div className="flex w-full justify-center space-x-8">
+                
+                {/* JOGADOR 1 (Esquerda) */}
+                <div className="flex-none max-w-xs"> 
+                  <MatchSimulator
+                      ranking={ranking} isLoading={isLoading} playerNumber={1}
+                      selectedPlayer={selectedPlayer1} onSelectPlayer={setSelectedPlayer1}
+                      odds={odds1} onSetOdds={setOdds1} otherPlayerValue={selectedPlayer2}
+                  />
+                </div>
 
-          {/* Jogador 2 (EM PILHA ABAIXO DO JOGADOR 1) */}
-          <MatchSimulator
-              ranking={ranking} isLoading={isLoading} playerNumber={2}
-              selectedPlayer={selectedPlayer2} onSelectPlayer={setSelectedPlayer2}
-              odds={odds2} onSetOdds={setOdds2} otherPlayerValue={selectedPlayer1}
-          />
+                {/* JOGADOR 2 (Direita) - ALINHADO COM O JOGADOR 1 */}
+                <div className="flex-none max-w-xs">
+                  <MatchSimulator
+                      ranking={ranking} isLoading={isLoading} playerNumber={2}
+                      selectedPlayer={selectedPlayer2} onSelectPlayer={setSelectedPlayer2}
+                      odds={odds2} onSetOdds={setOdds2} otherPlayerValue={selectedPlayer1}
+                  />
+                </div>
+                
+            </div>
+            
+             {/* Botão CALCULATE PROBABILITY (Centralizado abaixo das caixas) */}
+            <div className="mt-8 w-full max-w-lg text-center"> 
+                 <button
+                    type="button"
+                    className="w-full px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-xl hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-xl"
+                    onClick={handleCentralButtonClick}
+                    disabled={isLoading || !selectedPlayer1 || !selectedPlayer2 || !odds1 || !odds2}
+                 >
+                    {isLoading ? 'CALCULANDO...' : 'CALCULATE PROBABILITY'}
+                 </button>
+            </div>
+            
+            {/* Área de Resultados (Abaixo do Botão) */}
+            {renderFloatingResults}
+            
         </div>
 
-        {/* 3. COLUNA DIREITA VAZIA: ESPAÇAMENTO */}
-        {/* Ocupa o último 1/3, garantindo que o formulário fique centralizado */}
+        {/* 3. COLUNA DIREITA VAZIA: ESPAÇAMENTO (Mantida para simetria no max-w-6xl) */}
         <div className="flex-1 w-1/3 ml-8"> 
           {/* Espaço Vazio para Alinhamento */}
         </div>
       </div>
-      
-      {/* Botão CALCULATE PROBABILITY (Posicionado abaixo dos formulários, no centro) */}
-      <div className="w-full max-w-sm mx-auto text-center relative z-10 mb-12">
-          <button
-              type="button"
-              className="w-full px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-xl hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-xl"
-              onClick={handleCentralButtonClick}
-              disabled={isLoading || !selectedPlayer1 || !selectedPlayer2 || !odds1 || !odds2}
-          >
-              {isLoading ? 'CALCULANDO...' : 'CALCULATE PROBABILITY'}
-          </button>
-      </div>
-      
-      {/* Área de Resultados (Aparece abaixo do Botão) */}
-      <div className="w-full relative z-10">
-          {renderFloatingResults}
-      </div>
-
     </div>
   );
 };

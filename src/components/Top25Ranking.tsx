@@ -1,4 +1,4 @@
-// Em: src/components/Top25Ranking.tsx (Ajuste de Altura e Largura)
+// Em: src/components/Top25Ranking.tsx (Corrigido para Altura)
 
 import React from 'react';
 
@@ -21,7 +21,7 @@ export function Top25Ranking({ ranking }: RankingProps) {
             <h3 className="text-xl font-bold text-center text-green-400 uppercase">
                 ATP Elo Ranking (Top 25)
             </h3>
-            {/* Altura fixa (h-96) para que ela se estique bem */}
+            {/* Altura h-96 para que ela se estique bem */}
             <div className="max-h-96 h-96 overflow-y-auto"> 
                 <table className="w-full text-left text-sm text-gray-400">
                     <thead className="text-xs uppercase bg-gray-700 text-gray-200 sticky top-0">
