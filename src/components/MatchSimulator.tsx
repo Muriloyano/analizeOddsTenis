@@ -116,7 +116,7 @@ export function MatchSimulator({ ranking, onSimulate, isLoading }: SimulatorProp
                 
                 {/* --- Jogador A --- */}
                 <div className="space-y-4">
-                    <h3 className="text-xl font-semibold text-gray-200"> Jogador 1</h3>
+                <h3 className="text-xl font-semibold text-gray-200 mb-4"> Jogador 1</h3>
                     <ComboboxSearch
                         label="Nome do jogador"
                         items={playerItems}
@@ -139,7 +139,7 @@ export function MatchSimulator({ ranking, onSimulate, isLoading }: SimulatorProp
 
                 {/* --- Jogador B --- */}
                 <div className="space-y-4">
-                    <h3 className="text-xl font-semibold text-gray-200"> Jogador 2</h3>
+                <h3 className="text-xl font-semibold text-gray-200 mb-4"> Jogador 2</h3>
                     <ComboboxSearch
                         label="Nome do jogador"
                         items={playerItems}
