@@ -21,7 +21,7 @@ export function ComboboxSearch({ label, items, selectedValue, onSelect }: Combob
 
   // 1. Lógica de Filtragem (Minimalista e Rápido)
   const filteredItems = useMemo(() => {
-    if (!searchTerm) return items.slice(0, 50); // Limita a 50 se não houver busca
+    if (!searchTerm) return items.slice(0, 500); // Limita a 50 se não houver busca
     
     return items.filter(item =>
       item.label.toLowerCase().includes(searchTerm.toLowerCase())
