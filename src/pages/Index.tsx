@@ -1,12 +1,12 @@
-// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA: LAYOUT E NAVEGAÇÃO)
+// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA: FLEX BOX ESTÁVEL)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
 import { Top25Ranking } from "../components/Top25Ranking"; 
 import { toast } from "sonner"; 
-import { useNavigate } from 'react-router-dom'; // CORREÇÃO: Uso do useNavigate
+import { useNavigate } from 'react-router-dom';
 
-// --- TIPOS DE DADOS ESTRUTURAIS ---
+// --- TIPOS DE DADOS ESTRUTURAIS (Mantidos) ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -39,18 +39,15 @@ const getRecommendation = (ev1: number, ev2: number, player1: string, player2: s
 
 // --- COMPONENTE PRINCIPAL (PÁGINA) ---
 const Index = (): JSX.Element => { 
-  const navigate = useNavigate(); // Uso correto do hook
+  const navigate = useNavigate();
 
-  // --- ESTADOS DE DADOS DA APLICAÇÃO ---
+  // --- ESTADOS DE DADOS DA APLICAÇÃO (Mantidos) ---
   const [ranking, setRanking] = useState<JogadorElo[]>([]); 
   const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null);
-  
   const [selectedPlayer1, setSelectedPlayer1] = useState<string>(''); 
   const [selectedPlayer2, setSelectedPlayer2] = useState<string>(''); 
   const [odds1, setOdds1] = useState<string>('');
   const [odds2, setOdds2] = useState<string>('');
-
-  // ESTADOS DE CONTROLE
   const [isLoading, setIsLoading] = useState<boolean>(false); 
   const [isFetchingRanking, setIsFetchingRanking] = useState<boolean>(true);
 
@@ -60,7 +57,7 @@ const Index = (): JSX.Element => {
   const headerColor = 'text-white';
 
 
-  // --- FETCH RANKING ---
+  // --- FETCH RANKING e LÓGICA DE SIMULAÇÃO (Mantidos) ---
   const fetchRanking = useCallback(async () => {
     setIsFetchingRanking(true);
     try {
@@ -81,7 +78,6 @@ const Index = (): JSX.Element => {
     document.title = "Simulador de Confrontos no Tênis (By ELo)";
   }, [fetchRanking]);
 
-  // --- LÓGICA DE SIMULAÇÃO e NAVEGAÇÃO ---
   const handleSimulate = useCallback((data: SimulationData) => {
     setIsLoading(true);
     try {
@@ -96,7 +92,6 @@ const Index = (): JSX.Element => {
         odds1: data.odds1, odds2: data.odds2, recommendation: recommendation,
       };
 
-      // NAVEGAÇÃO: Passa os dados via state para a rota /results
       navigate('/results', { state: { result } });
 
     } catch (error) {
@@ -105,7 +100,7 @@ const Index = (): JSX.Element => {
     } finally {
       setIsLoading(false);
     }
-  }, [navigate]); 
+  }, [navigate]);
 
   const handleCentralButtonClick = () => {
     if (!selectedPlayer1 || !selectedPlayer2 || !odds1 || !odds2 || selectedPlayer1 === selectedPlayer2) {
@@ -123,12 +118,10 @@ const Index = (): JSX.Element => {
     });
   };
   
-  // --- FUNÇÃO PARA RENDERIZAR RESULTADOS (Simplificada para o novo layout) ---
   const renderFloatingResults = useMemo(() => {
-    // ... (Apenas mostra resultados, sem a complexidade de layout flutuante)
     if (!simulationResult) return null;
-    
-    // ... (Lógica do EvCard e renderização dos resultados) ...
+    // ... (Lógica de renderização de resultados - Mantida) ...
+    // ...
     const { ev1, ev2 } = simulationResult;
     const isPlayer1Value = ev1 > ev2; 
 
@@ -143,11 +136,22 @@ const Index = (): JSX.Element => {
     };
 
     return (
-        <div className="mt-8 pt-4 border-t border-gray-700 w-full max-w-6xl">
+        <div className="mt-8 pt-4 border-t border-gray-700 w-full">
             <h3 className="text-2xl font-bold text-center mb-4">Resultado da Análise</h3>
             <div className="flex justify-center space-x-8">
                 <EvCard player={simulationResult.player1} ev={ev1} isBest={isPlayer1Value} />
                 <EvCard player={simulationResult.player2} ev={ev2} isBest={!isPlayer1Value} />
+            </div>
+            
+            <div className="mt-6 p-4 bg-indigo-900/70 border border-indigo-400 rounded-lg text-center">
+                <p className="text-sm font-semibold text-indigo-200">Conclusão:</p>
+                <p className="text-base text-white mt-1">{simulationResult.recommendation}</p>
+                <button 
+                  onClick={() => setSimulationResult(null)}
+                  className="mt-2 text-sm text-indigo-300 hover:text-indigo-100 font-medium"
+                >
+                  (Nova Análise)
+                </button>
             </div>
         </div>
     );
@@ -181,23 +185,26 @@ const Index = (): JSX.Element => {
         </p>
       </div>
 
-      {/* CONTAINER PRINCIPAL: GRID 3 COLUNAS FIXAS */}
-      <div className="container mx-auto py-4 relative z-10 grid grid-cols-[400px_1fr_1fr] gap-x-8 items-start max-w-6xl px-4">
+      {/* CONTAINER PRINCIPAL: FLEX BOX DE 2 PARTES PARA ESTABILIDADE */}
+      <div className="container mx-auto py-4 relative z-10 flex items-start justify-center flex-grow max-w-6xl px-4">
         
-        {/* 1. COLUNA ESQUERDA: TABELA TOP 25 (Largura Fixa de 400px) */}
-        <div className="col-span-1 mt-4"> 
+        {/* 1. COLUNA ESQUERDA: TABELA TOP 25 (LARGURA FIXA MAIOR) */}
+        {/* Adicionado w-[400px] para a tabela ter espaço e não ser esmagada */}
+        <div className="flex-none w-[400px] mr-8 mt-4"> 
           {ranking.length > 0 && (
               <Top25Ranking ranking={ranking} />
           )}
         </div>
 
-        {/* 2. COLUNA CENTRAL (FORMULÁRIOS LADO A LADO) */}
-        <div className="col-span-1 flex flex-col items-center mt-4 w-full">
+        {/* 2. COLUNA DIREITA: FORMULÁRIOS LADO A LADO + BOTÃO */}
+        {/* Ocupa o espaço restante (flex-1) */}
+        <div className="flex-1 flex flex-col items-center mt-4">
             
             {/* LINHA 1: JOGADOR 1 e JOGADOR 2 LADO A LADO */}
             <div className="flex w-full justify-center space-x-8">
                 
                 {/* JOGADOR 1 (Esquerda) */}
+                {/* Removido min-w-0 para dar espaço, usando flex-1 para crescimento */}
                 <div className="flex-1 w-full"> 
                   <MatchSimulator
                       ranking={ranking} isLoading={isLoading} playerNumber={1}
@@ -218,7 +225,7 @@ const Index = (): JSX.Element => {
             </div>
             
              {/* Botão CALCULATE PROBABILITY (Centralizado abaixo das caixas) */}
-            <div className="mt-8 w-full max-w-sm text-center">
+            <div className="mt-8 w-full max-w-md text-center">
                  <button
                     type="button"
                     className="w-full px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-xl hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-xl"
@@ -233,11 +240,7 @@ const Index = (): JSX.Element => {
             {renderFloatingResults}
             
         </div>
-
-        {/* 3. COLUNA DIREITA VAZIA: ESPAÇAMENTO VAZIO */}
-        <div className="col-span-1"> 
-          {/* Espaço Vazio para Alinhamento */}
-        </div>
+        
       </div>
     </div>
   );
