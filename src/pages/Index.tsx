@@ -1,11 +1,11 @@
-// Em: src/pages/Index.tsx (VERSÃO FINAL: TABELA ESQUERDA + FORMULÁRIOS LADO A LADO)
+// Em: src/pages/Index.tsx
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
 import { Top25Ranking } from "../components/Top25Ranking"; 
 import { toast } from "sonner"; 
 
-// --- TIPOS DE DADOS ESTRUTURAIS ---
+// --- TIPOS DE DADOS ESTRUTURAIS (Mantidos) ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -57,7 +57,7 @@ const Index = (): JSX.Element => {
   const headerColor = 'text-white';
 
 
-  // --- FETCH RANKING ---
+  // --- FETCH RANKING (Mantido) ---
   const fetchRanking = useCallback(async () => {
     setIsFetchingRanking(true);
     try {
@@ -78,7 +78,7 @@ const Index = (): JSX.Element => {
     document.title = "Simulador de Confrontos no Tênis (By ELo)";
   }, [fetchRanking]);
 
-  // --- LÓGICA DE SIMULAÇÃO e BOTÃO CENTRAL ---
+  // --- LÓGICA DE SIMULAÇÃO e BOTÃO CENTRAL (Mantidas) ---
   const handleSimulate = useCallback((data: SimulationData) => {
     setIsLoading(true);
     try {
@@ -189,14 +189,16 @@ const Index = (): JSX.Element => {
       <div className="container mx-auto py-4 relative z-10 flex items-start justify-center flex-grow max-w-6xl px-4">
         
         {/* 1. COLUNA ESQUERDA: TABELA TOP 25 (Mais Larga) */}
+        {/* Usa w-1/3 do espaço disponível no container flexível */}
         <div className="flex-none w-1/3 mr-8 mt-4"> 
           {ranking.length > 0 && (
               <Top25Ranking ranking={ranking} />
           )}
         </div>
 
-        {/* 2. COLUNA CENTRAL (FORMULÁRIOS LADO A LADO) */}
-        <div className="flex-none flex flex-col items-center max-w-sm">
+        {/* 2. COLUNA CENTRAL: FORMULÁRIOS J1 e J2 LADO A LADO */}
+        {/* Ocupa o espaço central restante e mantém os dois formulários lado a lado */}
+        <div className="flex-1 min-w-0 flex flex-col items-center">
             
             {/* LINHA 1: JOGADOR 1 e JOGADOR 2 LADO A LADO */}
             <div className="flex w-full justify-center space-x-8">
@@ -210,7 +212,7 @@ const Index = (): JSX.Element => {
                   />
                 </div>
 
-                {/* JOGADOR 2 (Direita) - ALINHADO COM O JOGADOR 1 */}
+                {/* JOGADOR 2 (Direita) */}
                 <div className="flex-none max-w-xs">
                   <MatchSimulator
                       ranking={ranking} isLoading={isLoading} playerNumber={2}
@@ -222,7 +224,7 @@ const Index = (): JSX.Element => {
             </div>
             
              {/* Botão CALCULATE PROBABILITY (Centralizado abaixo das caixas) */}
-            <div className="mt-8 w-full max-w-lg text-center"> 
+            <div className="mt-8 w-full max-w-lg text-center">
                  <button
                     type="button"
                     className="w-full px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-xl hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-xl"
@@ -238,7 +240,7 @@ const Index = (): JSX.Element => {
             
         </div>
 
-        {/* 3. COLUNA DIREITA VAZIA: ESPAÇAMENTO (Mantida para simetria no max-w-6xl) */}
+        {/* 3. COLUNA DIREITA VAZIA: ESPAÇAMENTO (Mantida para Simetria e Alinhamento) */}
         <div className="flex-1 w-1/3 ml-8"> 
           {/* Espaço Vazio para Alinhamento */}
         </div>
