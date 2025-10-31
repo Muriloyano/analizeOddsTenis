@@ -1,4 +1,4 @@
-// Em: src/pages/Index.tsx
+// Em: src/pages/Index.tsx (COM AUMENTO DA LARGURA DOS PAINÉIS LATERAIS)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
@@ -37,7 +37,7 @@ const getRecommendation = (ev1: number, ev2: number, player1: string, player2: s
 
 
 // --- COMPONENTE PRINCIPAL (PÁGINA) ---
-const Index = (): JSX.Element => { // <--- TIPAGEM EXPLÍCITA CORRIGIDA
+const Index = (): JSX.Element => { 
   // --- ESTADOS DE DADOS DA APLICAÇÃO ---
   const [ranking, setRanking] = useState<JogadorElo[]>([]); 
   const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null);
@@ -183,8 +183,8 @@ const Index = (): JSX.Element => { // <--- TIPAGEM EXPLÍCITA CORRIGIDA
       {/* Container Principal: Jogadores + Quadra */}
       <div className="container mx-auto py-4 relative z-10 flex items-start justify-center flex-grow max-w-full px-0">
         
-        {/* Coluna da Esquerda (Simulador Jogador 1) */}
-        <div className="flex-1 min-w-0 mr-8 mt-12 self-start max-w-xs"> 
+        {/* Coluna da Esquerda (Simulador Jogador 1) - MUDANÇA: max-w-sm */}
+        <div className="flex-1 min-w-0 mr-8 mt-12 self-start max-w-sm"> 
            <MatchSimulator
               ranking={ranking} isLoading={isLoading} playerNumber={1}
               selectedPlayer={selectedPlayer1} onSelectPlayer={setSelectedPlayer1}
@@ -236,8 +236,8 @@ const Index = (): JSX.Element => { // <--- TIPAGEM EXPLÍCITA CORRIGIDA
           
         </div>
 
-        {/* Coluna da Direita (Simulador Jogador 2) */}
-        <div className="flex-1 min-w-0 ml-8 mt-12 self-start max-w-xs">
+        {/* Coluna da Direita (Simulador Jogador 2) - MUDANÇA: max-w-sm */}
+        <div className="flex-1 min-w-0 ml-8 mt-12 self-start max-w-sm">
           <MatchSimulator
               ranking={ranking} isLoading={isLoading} playerNumber={2}
               selectedPlayer={selectedPlayer2} onSelectPlayer={setSelectedPlayer2}
