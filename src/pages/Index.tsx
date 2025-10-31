@@ -1,4 +1,4 @@
-// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA DO LAYOUT)
+// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA: LARGURA SIMÉTRICA)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
@@ -57,7 +57,7 @@ const Index = (): JSX.Element => {
   const headerColor = 'text-white';
 
 
-  // --- FETCH RANKING ---
+  // --- FETCH RANKING (Mantido) ---
   const fetchRanking = useCallback(async () => {
     setIsFetchingRanking(true);
     try {
@@ -78,7 +78,7 @@ const Index = (): JSX.Element => {
     document.title = "Simulador de Confrontos no Tênis (By ELo)";
   }, [fetchRanking]);
 
-  // --- LÓGICA DE SIMULAÇÃO e BOTÃO CENTRAL ---
+  // --- LÓGICA DE SIMULAÇÃO e BOTÃO CENTRAL (Mantidas) ---
   const handleSimulate = useCallback((data: SimulationData) => {
     setIsLoading(true);
     try {
@@ -185,23 +185,25 @@ const Index = (): JSX.Element => {
         </p>
       </div>
 
-      {/* CONTAINER PRINCIPAL: GRID 3 COLUNAS */}
-      <div className="container mx-auto py-4 relative z-10 grid grid-cols-[1.2fr_2fr_1fr] gap-x-8 items-start max-w-6xl px-4">
+      {/* CONTAINER PRINCIPAL: GRID 3 COLUNAS FIXAS */}
+      {/* Colunas: [ Tabela (400px) | Formulários (auto) | Espaço (auto) ] */}
+      <div className="container mx-auto py-4 relative z-10 grid grid-cols-[400px_1fr_1fr] gap-x-8 items-start max-w-6xl px-4">
         
-        {/* 1. COLUNA ESQUERDA: TABELA TOP 25 (1.2fr) */}
+        {/* 1. COLUNA ESQUERDA: TABELA TOP 25 (Largura Fixa de 400px) */}
         <div className="col-span-1 mt-4"> 
           {ranking.length > 0 && (
               <Top25Ranking ranking={ranking} />
           )}
         </div>
 
-        {/* 2. COLUNA CENTRAL: FORMULÁRIOS J1 e J2 LADO A LADO (2fr) */}
+        {/* 2. COLUNA CENTRAL (FORMULÁRIOS LADO A LADO) */}
+        {/* Ocupa o espaço central restante (1fr) */}
         <div className="col-span-1 flex flex-col items-center mt-4 w-full">
             
             {/* LINHA 1: JOGADOR 1 e JOGADOR 2 LADO A LADO */}
             <div className="flex w-full justify-center space-x-8">
                 
-                {/* JOGADOR 1 */}
+                {/* JOGADOR 1 (Esquerda) - Ajustado para usar flex-1 e min-w-0 */}
                 <div className="flex-1 min-w-0"> 
                   <MatchSimulator
                       ranking={ranking} isLoading={isLoading} playerNumber={1}
@@ -210,7 +212,7 @@ const Index = (): JSX.Element => {
                   />
                 </div>
 
-                {/* JOGADOR 2 */}
+                {/* JOGADOR 2 (Direita) - Ajustado para usar flex-1 e min-w-0 */}
                 <div className="flex-1 min-w-0">
                   <MatchSimulator
                       ranking={ranking} isLoading={isLoading} playerNumber={2}
@@ -222,7 +224,7 @@ const Index = (): JSX.Element => {
             </div>
             
              {/* Botão CALCULATE PROBABILITY (Centralizado abaixo das caixas) */}
-            <div className="mt-8 w-full max-w-md text-center">
+            <div className="mt-8 w-full max-w-sm text-center">
                  <button
                     type="button"
                     className="w-full px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-xl hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-xl"
@@ -238,9 +240,9 @@ const Index = (): JSX.Element => {
             
         </div>
 
-        {/* 3. COLUNA DIREITA VAZIA: ESPAÇAMENTO VAZIO (1fr) */}
+        {/* 3. COLUNA DIREITA VAZIA: ESPAÇAMENTO VAZIO */}
         <div className="col-span-1"> 
-          {/* Espaço Vazio para Simetria Visual */}
+          {/* Espaço Vazio para Alinhamento */}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-// Em: src/components/MatchSimulator.tsx (Inputs Maiores e Estabilidade)
+// Em: src/components/MatchSimulator.tsx (CORREÇÃO DE INPUTS)
 
 import React, { useMemo } from 'react';
 import { ComboboxSearch } from './ComboboxSearch'; 
@@ -32,7 +32,7 @@ type SimulatorProps = {
 // --- FUNÇÃO DE FILTRO (Mantida) ---
 const filterOddsValue = (value: string) => value.replace(/[^0-9.,]/g, '');
 
-// --- INPUT PADRÃO (p-3) ---
+// --- INPUT PADRÃO (p-4 para ser MAIS LARGO) ---
 const InputDark = React.memo((props: { value: string, onChange: (e: any) => void, placeholder: string, label: string }) => {
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,8 +48,8 @@ const InputDark = React.memo((props: { value: string, onChange: (e: any) => void
                 value={props.value}
                 onChange={handleChange} 
                 placeholder={props.placeholder}
-                // Voltando ao p-3 para caixa de texto menor
-                className="w-full p-3 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
+                // CORREÇÃO: PADDING AUMENTADO para p-4
+                className="w-full p-4 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
                 required
             />
         </div>
@@ -108,7 +108,7 @@ export function MatchSimulator({
           onSelect={onSelectPlayer}
       />
       
-      {/* 2. INPUT DE ODDS (Caixa de texto menor) */}
+      {/* 2. INPUT DE ODDS (Caixa de texto maior) */}
       <InputDark 
           value={odds} 
           onChange={(e) => onSetOdds(filterOddsValue(e.target.value))} 
