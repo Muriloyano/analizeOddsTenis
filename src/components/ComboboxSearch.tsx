@@ -1,83 +1,104 @@
-// Em: src/components/ComboboxSearch.tsx
+// Em: src/components/ComboboxSearch.tsx (CORRIGIDO: Imports e Classes)
 
-import { useState, useMemo } from 'react';
+import React, { useState, Fragment, useMemo } from 'react';
+// CORREÇÃO: Importar Headless UI (Assumindo que está instalado, se não, rode npm install @headlessui/react)
+import { Combobox, Transition } from '@headlessui/react';
+// CORREÇÃO: Importar o ícone (Assumindo que @heroicons/react está instalado, se não, rode npm install @heroicons/react)
+import { ChevronUpDownIcon } from '@heroicons/react/20/solid'; 
 
+
+// --- TIPOS ---
 type Item = {
-  value: string; // O valor a ser retornado (ex: "nome|elo")
-  label: string; // O texto que aparece na lista (ex: "1. Federer (2200 Elo)")
+  value: string;
+  label: string;
+  disabled?: boolean;
 };
 
-type ComboboxProps = {
+type ComboboxSearchProps = {
   label: string;
-  items: Item[]; // A lista de jogadores que vamos buscar
+  items: Item[];
   selectedValue: string;
   onSelect: (value: string) => void;
+  // Nova prop para estilizar o input
+  inputClassName?: string; 
 };
 
-// Este é o componente que faremos o MatchSimulator usar
-export function ComboboxSearch({ label, items, selectedValue, onSelect }: ComboboxProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
+export function ComboboxSearch({ label, items, selectedValue, onSelect, inputClassName }: ComboboxSearchProps) {
+  const [query, setQuery] = useState('');
 
-  // 1. Lógica de Filtragem (Minimalista e Rápido)
   const filteredItems = useMemo(() => {
-    if (!searchTerm) return items.slice(0, 500); // Limita a 50 se não houver busca
-    
-    return items.filter(item =>
-      item.label.toLowerCase().includes(searchTerm.toLowerCase())
-    ).slice(0, 50); // Limita a 50 resultados na busca
-  }, [searchTerm, items]);
+    if (query === '') {
+      // Limita a 50 itens se não houver busca, para performance
+      return items.slice(0, 50); 
+    }
+    return items.filter((item) => {
+      return item.label.toLowerCase().includes(query.toLowerCase());
+    });
+  }, [query, items]);
 
-  // 2. Determina o label do item selecionado
-  const selectedLabel = useMemo(() => {
-      const item = items.find(i => i.value === selectedValue);
-      return item ? item.label : '';
+  const displayValue = useMemo(() => {
+    const selectedItem = items.find(item => item.value === selectedValue);
+    if (selectedItem) {
+        const parts = selectedItem.label.split(' (');
+        return parts[0].replace(/^\d+\.\s*/, ''); 
+    }
+    return '';
   }, [selectedValue, items]);
 
-
-  const handleSelect = (value: string) => {
-    onSelect(value); // Retorna o valor completo
-    setSearchTerm('');
-    setIsOpen(false);
-  };
-
   return (
-    <div className="relative z-10"> {/* z-10 para o dropdown ficar por cima de tudo */}
-        <label className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
-        
-        {/* Input de Busca (Onde o usuário digita) */}
-        <input
-            type="text"
-            placeholder={selectedLabel || "Digite para buscar o jogador..."}
-            value={searchTerm || selectedLabel}
-            onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setIsOpen(true);
-                onSelect(''); // Limpa a seleção enquanto digita
-            }}
-            onFocus={() => setIsOpen(true)}
-            onBlur={() => setTimeout(() => setIsOpen(false), 200)} // Pequeno delay
-            className="w-full p-3 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
-        />
-
-        {/* Dropdown de Resultados */}
-        {isOpen && (
-            <div className="absolute w-full mt-1 max-h-60 overflow-y-auto bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
-                {filteredItems.length === 0 && (
-                    <div className="p-3 text-sm text-gray-400">Nenhum jogador encontrado.</div>
-                )}
-                
-                {filteredItems.map(item => (
-                    <div
-                        key={item.value}
-                        onMouseDown={() => handleSelect(item.value)} // Usa onMouseDown para evitar o onBlur
-                        className={`p-3 text-sm cursor-pointer hover:bg-gray-700 ${item.value === selectedValue ? 'bg-gray-700 text-green-500' : 'text-gray-300'}`}
-                    >
+    <div className="relative z-10 w-full"> 
+      <Combobox value={selectedValue} onChange={onSelect}>
+        <Combobox.Label className="block text-sm font-medium text-gray-400 mb-1">
+          {label}
+        </Combobox.Label>
+        <div className="relative">
+          <Combobox.Input
+            // CORREÇÃO: Aplicar as classes de tamanho p-4 e text-lg 
+            // e garantir que a cor do texto do placeholder esteja correta
+            className={inputClassName || "w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out placeholder-gray-400"} 
+            displayValue={() => displayValue}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Digite para buscar o jogador..."
+          />
+          <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+            <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          </Combobox.Button>
+        </div>
+        <Transition
+          as={Fragment}
+          leave="transition ease-in duration-100"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+          afterLeave={() => setQuery('')}
+        >
+          <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm custom-scrollbar z-50">
+            {filteredItems.length === 0 && query !== '' ? (
+              <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
+                Nenhum jogador encontrado.
+              </div>
+            ) : (
+              filteredItems.map((item) => (
+                <Combobox.Option
+                  key={item.value}
+                  className={({ active }) =>
+                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                      active ? 'bg-green-600 text-white' : 'text-gray-200'
+                    } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`
+                  }
+                  value={item.value}
+                  disabled={item.disabled}
+                >
+                  {({ selected, active }) => (
+                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
                         {item.label}
-                    </div>
-                ))}
-            </div>
-        )}
+                    </span>
+                  )}
+                </Combobox.Option>
+              ))
+            )}
+          </Combobox.Options>
+        </Transition>
+      </Combobox>
     </div>
   );
 }

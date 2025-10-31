@@ -1,9 +1,10 @@
-// Em: src/pages/Index.tsx (VERSÃO FINAL E CORRIGIDA: LAYOUT E ESTABILIDADE)
+// Em: src/pages/Index.tsx (VERSÃO FINAL COM CORREÇÃO DE ROTEAMENTO REACT-ROUTER-DOM)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
 import { Top25Ranking } from "../components/Top25Ranking"; 
 import { toast } from "sonner"; 
+import { useNavigate } from 'react-router-dom'; // <-- CORREÇÃO APLICADA AQUI
 
 // --- TIPOS DE DADOS ESTRUTURAIS (Mantidos) ---
 type JogadorElo = {
@@ -14,7 +15,6 @@ type JogadorElo = {
 type AnalysisResult = {
   player1: string; player2: string; elo1: number; elo2: number; prob1: number; prob2: number; ev1: number; ev2: number; odds1: number; odds2: number; recommendation: string;
 };
-
 // --- FUNÇÕES DE CÁLCULO (Mantidas) ---
 const calculateEloProbs = (elo1: number, elo2: number): { prob1: number, prob2: number } => {
   const eloDiff = elo1 - elo2;
@@ -38,9 +38,11 @@ const getRecommendation = (ev1: number, ev2: number, player1: string, player2: s
 
 // --- COMPONENTE PRINCIPAL (PÁGINA) ---
 const Index = (): JSX.Element => { 
+  const navigate = useNavigate(); // <-- USO CORRETO DO HOOK DE NAVEGAÇÃO
+
   // --- ESTADOS DE DADOS DA APLICAÇÃO ---
   const [ranking, setRanking] = useState<JogadorElo[]>([]); 
-  const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null);
+  const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null); // Mantido
   
   const [selectedPlayer1, setSelectedPlayer1] = useState<string>(''); 
   const [selectedPlayer2, setSelectedPlayer2] = useState<string>(''); 
@@ -57,15 +59,14 @@ const Index = (): JSX.Element => {
   const headerColor = 'text-white';
 
 
-  // --- FETCH RANKING (Mantido) ---
+  // --- FETCH RANKING ---
   const fetchRanking = useCallback(async () => {
     setIsFetchingRanking(true);
     try {
       const response = await fetch('/api/ranking-semanal');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      // GARANTIA: Verifica se 'ranking' existe antes de setar
-      setRanking(data.ranking || []); 
+      setRanking(data.ranking || []);
     } catch (error) {
       console.error("Erro ao buscar o ranking:", error);
       toast.error("Erro ao carregar o ranking inicial. Verifique a API.");
@@ -79,7 +80,7 @@ const Index = (): JSX.Element => {
     document.title = "Simulador de Confrontos no Tênis (By ELo)";
   }, [fetchRanking]);
 
-  // --- LÓGICA DE SIMULAÇÃO e BOTÃO CENTRAL (Mantidas) ---
+  // --- LÓGICA DE SIMULAÇÃO e NAVEGAÇÃO ---
   const handleSimulate = useCallback((data: SimulationData) => {
     setIsLoading(true);
     try {
@@ -88,12 +89,14 @@ const Index = (): JSX.Element => {
       const ev2 = calculateEV(prob2, data.odds2);
       const recommendation = getRecommendation(ev1, ev2, data.player1, data.player2);
 
-      setSimulationResult({
+      const result: AnalysisResult = {
         player1: data.player1, player2: data.player2, elo1: data.elo1, elo2: data.elo2,
         prob1: prob1 * 100, prob2: prob2 * 100, ev1: ev1, ev2: ev2,
         odds1: data.odds1, odds2: data.odds2, recommendation: recommendation,
-      });
-      toast.success(`Análise concluída: ${data.player1} vs ${data.player2}`);
+      };
+
+      // NAVEGAÇÃO CORRIGIDA: Passa os dados via state para a rota /results
+      navigate('/results', { state: { result } });
 
     } catch (error) {
       console.error("Erro na simulação:", error);
@@ -101,7 +104,8 @@ const Index = (): JSX.Element => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [navigate]); // navigate deve ser dependência
+
 
   const handleCentralButtonClick = () => {
     if (!selectedPlayer1 || !selectedPlayer2 || !odds1 || !odds2 || selectedPlayer1 === selectedPlayer2) {
@@ -122,7 +126,7 @@ const Index = (): JSX.Element => {
   // --- FUNÇÃO PARA RENDERIZAR RESULTADOS (Mantida) ---
   const renderFloatingResults = useMemo(() => {
     if (!simulationResult) return null;
-
+    // ... (Lógica do renderFloatingResults - Mantida) ...
     const { ev1, ev2 } = simulationResult;
     const isPlayer1Value = ev1 > ev2; 
 
@@ -248,4 +252,4 @@ const Index = (): JSX.Element => {
   );
 };
 
-export default Index
+export default Index;

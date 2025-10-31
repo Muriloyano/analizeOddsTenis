@@ -1,10 +1,10 @@
-// Em: src/components/MatchSimulator.tsx (CORREÇÃO DE INPUTS)
+// Em: src/components/MatchSimulator.tsx (Substitua todo o conteúdo)
 
 import React, { useMemo } from 'react';
 import { ComboboxSearch } from './ComboboxSearch'; 
 import { toast } from 'sonner';
 
-// --- TIPOS --- (Mantidos)
+// --- TIPOS ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -48,8 +48,8 @@ const InputDark = React.memo((props: { value: string, onChange: (e: any) => void
                 value={props.value}
                 onChange={handleChange} 
                 placeholder={props.placeholder}
-                // CORREÇÃO: PADDING AUMENTADO para p-4
-                className="w-full p-4 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
+                // CORREÇÃO: p-4 para caixa de texto maior e text-lg para o texto interno
+                className="w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
                 required
             />
         </div>
@@ -93,7 +93,8 @@ export function MatchSimulator({
 
 
   return (
-    <div className="p-6 bg-gray-800/80 rounded-xl border border-gray-700 text-gray-100 shadow-xl space-y-5"> 
+    // CORREÇÃO: Adicionado w-full para preencher a largura disponível
+    <div className="p-6 bg-gray-800/80 rounded-xl border border-gray-700 text-gray-100 shadow-xl space-y-5 w-full"> 
       
       {/* Título do Jogador */}
       <h3 className={`text-xl font-extrabold text-center uppercase tracking-wide ${playerColor}`}>
@@ -106,6 +107,8 @@ export function MatchSimulator({
           items={filteredPlayerItems}
           selectedValue={selectedPlayer}
           onSelect={onSelectPlayer}
+          // Passando classes para o input interno do Combobox
+          inputClassName="w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out"
       />
       
       {/* 2. INPUT DE ODDS (Caixa de texto maior) */}
