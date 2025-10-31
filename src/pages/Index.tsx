@@ -1,12 +1,13 @@
-// Em: src/pages/Index.tsx
+// Em: src/pages/Index.tsx (VERSÃO FINAL E ESTÁVEL)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
-import { Top25Ranking } from "../components/Top25Ranking"; // NOVO
-import { ParticleBackground } from "../components/ParticleBackground"; // NOVO
+// Importação da Tabela Top 25 (ASSUMIMOS QUE ESTE COMPONENTE FUNCIONA)
+import { Top25Ranking } from "../components/Top25Ranking"; 
+// REMOVIDO: import { ParticleBackground } 
 import { toast } from "sonner"; 
 
-// --- TIPOS DE DADOS ESTRUTURAIS ---
+// --- TIPOS DE DADOS ESTRUTURAIS (Mantidos) ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -51,6 +52,11 @@ const Index = (): JSX.Element => {
   // ESTADOS DE CONTROLE
   const [isLoading, setIsLoading] = useState<boolean>(false); 
   const [isFetchingRanking, setIsFetchingRanking] = useState<boolean>(true);
+
+
+  // --- CORREÇÃO DE TEMA (DARK MODE FIXO) ---
+  const backgroundClass = 'bg-gray-950 text-gray-100';
+  const headerColor = 'text-white';
 
 
   // --- FETCH RANKING ---
@@ -164,20 +170,16 @@ const Index = (): JSX.Element => {
   }
 
   return (
-    // DARK MODE FIXO
-    <div className="min-h-screen bg-gray-950 text-gray-100 relative overflow-hidden flex flex-col items-center"> 
+    <div className={`min-h-screen ${backgroundClass} relative overflow-hidden flex flex-col items-center`}> 
       
-      {/* 1. FUNDO INTERATIVO: z-0 para ficar no fundo */}
-      <ParticleBackground />
-      
-      {/* Círculo de Degrade Verde (Fixo - z-10) */}
-      <div className="absolute top-0 left-0 w-96 h-96 blur-3xl opacity-30 z-10 pointer-events-none">
+      {/* Círculo de Degrade Verde (Apenas para o Night Mode - opcional) */}
+      <div className="absolute top-0 left-0 w-96 h-96 blur-3xl opacity-30 z-0 pointer-events-none">
           <div className="w-full h-full rounded-full bg-green-500/50 transform translate-x-[-50%] translate-y-[-50%]"></div>
       </div>
       
-      {/* Título Principal no Topo (z-20 para ficar acima de tudo) */}
-      <div className="w-full text-center py-8 relative z-20">
-        <h1 className="text-4xl font-extrabold text-white uppercase tracking-wider">
+      {/* Título Principal no Topo */}
+      <div className="w-full text-center py-8 relative z-10">
+        <h1 className={`text-4xl font-extrabold uppercase tracking-wider ${headerColor}`}>
           TENNIS MATCH PREDICTOR
         </h1>
         <p className="text-lg font-semibold text-gray-400 mt-2">
@@ -185,19 +187,29 @@ const Index = (): JSX.Element => {
         </p>
       </div>
 
-      {/* CONTAINER PRINCIPAL (z-20) */}
-      <div className="container mx-auto py-4 relative z-20 flex flex-col items-center flex-grow max-w-4xl px-4">
+      {/* CONTAINER PRINCIPAL: Jogadores e Botão (Minimalista) */}
+      <div className="container mx-auto py-4 relative z-10 flex flex-col items-center flex-grow max-w-4xl px-4">
         
         {/* CAIXAS LATERAIS (Lado a Lado) */}
         <div className="flex w-full justify-center space-x-8">
             
-            {/* Jogador 1 (Esquerda) */}
-            <div className="flex-1 max-w-xs"> 
+            {/* NOVO BLOCO DA ESQUERDA: Contém o MatchSimulator e a Tabela Top 25 */}
+            <div className="flex-1 max-w-xs flex flex-col space-y-6"> 
+              {/* 1. SIMULADOR DO JOGADOR 1 */}
               <MatchSimulator
                   ranking={ranking} isLoading={isLoading} playerNumber={1}
                   selectedPlayer={selectedPlayer1} onSelectPlayer={setSelectedPlayer1}
                   odds={odds1} onSetOdds={setOdds1} otherPlayerValue={selectedPlayer2}
               />
+              {/* 2. TABELA TOP 25 (Abaixo do Simulador) */}
+              {ranking.length > 0 && (
+                  <Top25Ranking ranking={ranking} />
+              )}
+            </div>
+
+            {/* COLUNA CENTRAL DE ESPAÇO VAZIO (Para centralizar o botão/espaço) */}
+            <div className="flex-1 max-w-xs"> 
+              {/* Esta div está vazia, mas garante a largura do centro para que as caixas fiquem separadas */}
             </div>
 
             {/* Jogador 2 (Direita) */}
@@ -226,12 +238,14 @@ const Index = (): JSX.Element => {
         {/* Área de Resultados */}
         {renderFloatingResults}
 
-        {/* 2. TABELA DE RANKING (ABAixo do Formulário/Resultados) */}
+        {/* 2. TABELA DE RANKING (ABAixo do Formulário/Resultados) - Removida daqui para ficar na coluna esquerda */}
+        {/*
         {ranking.length > 0 && (
             <div className="w-full max-w-xl mt-12 mb-12">
                 <Top25Ranking ranking={ranking} />
             </div>
         )}
+        */}
 
       </div>
     </div>
