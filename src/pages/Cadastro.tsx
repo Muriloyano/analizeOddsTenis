@@ -1,4 +1,4 @@
-// Em: src/pages/Cadastro.tsx (FINAL E CORRIGIDO PARA O TESTE COMPLETO)
+// Em: src/pages/Cadastro.tsx (Leitura de Resposta da API Robustecida)
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,14 +13,14 @@ const Cadastro = () => {
     const [source, setSource] = useState(''); 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [accessKey, setAccessKey] = useState(''); // Estado para a Chave de Acesso
+    const [accessKey, setAccessKey] = useState(''); 
     const [error, setError] = useState('');
 
     const handleCadastro = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
-        if (!firstName || !lastName || !birthDate || !email || !password || !accessKey) { 
+        if (!firstName || !lastName || !birthDate || !email || !password || !accessKey) {
             setError('Por favor, preencha todos os campos obrigatórios, incluindo a Chave de Acesso.');
             return;
         }
@@ -32,7 +32,7 @@ const Cadastro = () => {
             password,
             birthDate,
             source: source || undefined,
-            accessKey // Campo enviado para a API
+            accessKey 
         };
 
         try {
@@ -41,15 +41,33 @@ const Cadastro = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
             });
+            
+            // --- INÍCIO DA LÓGICA ROBUSTA DE LEITURA DE ERRO ---
+            let data;
+            
+            if (response.headers.get('content-type')?.includes('application/json')) {
+                // Se o servidor retornar JSON, leia o JSON (SUCESSO ou ERRO 400/409)
+                data = await response.json();
+            } else {
+                // Se o servidor não retornar JSON (Provável ERRO 500 ou HTML)
+                const errorText = await response.text();
+                console.error("ERRO DE API (Resposta não é JSON):", errorText);
+                
+                // Exibir a mensagem genérica que aponta para o console do DevTools
+                setError(`Erro interno do servidor. Status: ${response.status}. Por favor, verifique o Console (F12) para o log de erro exato do servidor.`);
+                return;
+            }
+            // --- FIM DA LÓGICA ROBUSTA ---
 
-            const data = await response.json();
 
             if (!response.ok) {
-                setError(data.error || 'Erro desconhecido ao cadastrar.');
+                // Erro (Chave inválida, e-mail já existe, etc.)
+                setError(data.error || `Erro de aplicação. Status: ${response.status}`);
                 toast.error(`Falha no Cadastro: ${data.error || 'Erro de rede'}`);
                 return;
             }
 
+            // Sucesso!
             toast.success('Usuário cadastrado com sucesso! Faça login.');
             setTimeout(() => {
                 navigate('/login');
@@ -57,11 +75,12 @@ const Cadastro = () => {
 
         } catch (err) {
             console.error(err);
-            setError('Erro de conexão. Servidor de autenticação inacessível.');
+            setError('Erro de rede. Servidor de autenticação inacessível.');
         }
     };
 
     return (
+        // ... (o restante do JSX do formulário, que permanece inalterado) ...
         <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
             <div className="p-10 bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-700">
                 <h2 className="text-4xl font-extrabold mb-8 text-center text-green-400">
@@ -70,7 +89,6 @@ const Cadastro = () => {
                 
                 <form onSubmit={handleCadastro} className="space-y-6">
                     
-                    {/* ESTRUTURA DE GRID: 2 COLUNAS E 3 LINHAS */}
                     <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                         
                         {/* 1A. Nome */}
@@ -158,9 +176,8 @@ const Cadastro = () => {
                             />
                         </div>
                     </div>
-                    {/* FIM DA ESTRUTURA DE GRID */}
 
-                    {/* CAMPO NOVO E ESSENCIAL: CHAVE DE ACESSO (Largura total) */}
+                    {/* CAMPO NOVO E ESSENCIAL: CHAVE DE ACESSO */}
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Chave de Acesso / Convite</label>
                         <input
