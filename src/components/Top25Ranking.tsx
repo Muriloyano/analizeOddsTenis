@@ -1,4 +1,4 @@
-// Em: src/components/Top25Ranking.tsx (VERSÃO FINAL COM TEMA CLARO APRIMORADO)
+// Em: src/components/Top25Ranking.tsx (FINAL: Sem Propriedade 'theme')
 
 import React from 'react';
 
@@ -8,23 +8,20 @@ type JogadorElo = {
   elo: number;
 };
 
+// TEMA REMOVIDO DA TIPAGEM
 type RankingProps = {
     ranking: JogadorElo[];
-    theme: 'dark' | 'light'; // <--- USADO PARA ALTERAR O ESTILO
 };
 
-export function Top25Ranking({ ranking, theme }: RankingProps) {
+export function Top25Ranking({ ranking }: RankingProps) { // <-- REMOVIDO 'theme'
     const top25 = ranking.slice(0, 25); 
 
-    // Classes para o modo claro (Cinza suave)
-    const cardBg = theme === 'dark' 
-        ? 'bg-gray-800/90 border-gray-700' 
-        : 'bg-gray-100 border-gray-300'; // Fundo Cinza Claro
-        
-    const headerBg = theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700';
-    const bodyText = theme === 'dark' ? 'text-gray-400' : 'text-gray-600';
-    const nameText = theme === 'dark' ? 'text-white' : 'text-gray-900';
-    const hoverBg = theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-100';
+    // Classes fixas para o Dark Mode
+    const cardBg = 'bg-gray-800/90 border-gray-700'; 
+    const headerBg = 'bg-gray-700 text-gray-200';
+    const bodyText = 'text-gray-400';
+    const nameText = 'text-white';
+    const hoverBg = 'hover:bg-gray-700/50';
 
     return (
         <div className={`p-4 rounded-xl shadow-2xl space-y-4 w-full h-full ${cardBg}`}> 

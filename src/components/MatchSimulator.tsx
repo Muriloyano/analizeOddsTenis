@@ -1,4 +1,4 @@
-// Em: src/components/MatchSimulator.tsx (VERSÃO FINAL COM TEMA CLARO APRIMORADO)
+// Em: src/components/MatchSimulator.tsx (FINAL: Sem Propriedade 'theme')
 
 import React, { useMemo } from 'react';
 import { ComboboxSearch } from './ComboboxSearch'; 
@@ -15,7 +15,7 @@ export type SimulationData = {
   player2: string; elo2: number; odds2: number;
 };
 
-// --- PROPS DO SIMULATOR ---
+// --- PROPS DO SIMULATOR (TEMA REMOVIDO) ---
 type SimulatorProps = {
   ranking: JogadorElo[];
   isLoading: boolean;
@@ -26,20 +26,18 @@ type SimulatorProps = {
   odds: string;
   onSetOdds: (value: string) => void;
   otherPlayerValue: string;
-  theme: 'dark' | 'light'; // <--- USADO PARA ALTERAR O ESTILO
+  // theme: 'dark' | 'light';  <--- REMOVIDO DA TIPAGEM
 };
 
 
 // --- FUNÇÃO DE FILTRO (Mantida) ---
 const filterOddsValue = (value: string) => value.replace(/[^0-9.,]/g, '');
 
-// --- INPUT PADRÃO (Ajustado para Tema) ---
-const InputDark = React.memo((props: { value: string, onChange: (e: any) => void, placeholder: string, label: string, theme: 'dark' | 'light' }) => {
+// --- INPUT PADRÃO (Dark Mode Fixo) ---
+const InputDark = React.memo((props: { value: string, onChange: (e: any) => void, placeholder: string, label: string }) => {
     
-    // Classes de input para os dois temas
-    const inputClasses = props.theme === 'dark' 
-        ? 'bg-gray-700 text-gray-100 border-gray-600 focus:ring-green-500 focus:border-green-500'
-        : 'bg-gray-50 text-gray-900 border-gray-300 focus:ring-blue-500 focus:border-blue-500'; // Fundo Cinza Claro
+    // Classes fixas para o Dark Mode
+    const inputClasses = 'bg-gray-700 text-gray-100 border-gray-600 focus:ring-green-500 focus:border-green-500';
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         props.onChange(e); 
@@ -64,8 +62,8 @@ const InputDark = React.memo((props: { value: string, onChange: (e: any) => void
 
 // --- COMPONENTE MATCH SIMULATOR ---
 export function MatchSimulator({ 
-  ranking, isLoading, playerNumber, selectedPlayer, onSelectPlayer, odds, onSetOdds, otherPlayerValue, theme 
-}: SimulatorProps) {
+  ranking, isLoading, playerNumber, selectedPlayer, onSelectPlayer, odds, onSetOdds, otherPlayerValue,
+}: SimulatorProps) { // <-- REMOVIDO 'theme' DOS ARGUMENTOS
   
   // Prepara a lista de jogadores no formato que o Combobox entende
   const playerItems = useMemo(() => ranking.map(jogador => ({
@@ -96,10 +94,12 @@ export function MatchSimulator({
   const playerTitle = playerNumber === 1 ? 'JOGADOR 1' : 'JOGADOR 2';
   const playerColor = playerNumber === 1 ? 'text-green-400' : 'text-blue-400';
   
-  // Fundo do Card Principal (Dark/Light)
-  const cardBg = theme === 'dark' 
-    ? 'bg-gray-800/80 border-gray-700 text-gray-100' 
-    : 'bg-gray-100 border-gray-300 text-gray-900'; // Cinza Claro Suave
+  // Fundo do Card Principal (Dark Mode Fixo)
+  const cardBg = 'bg-gray-800/80 border-gray-700 text-gray-100';
+
+  // Classes de input para passar para o Combobox
+  const comboboxInputClasses = "w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out placeholder-gray-400";
+
 
   return (
     <div className={`p-6 rounded-xl shadow-xl space-y-5 w-full ${cardBg}`}> 
@@ -115,12 +115,7 @@ export function MatchSimulator({
           items={filteredPlayerItems}
           selectedValue={selectedPlayer}
           onSelect={onSelectPlayer}
-          // Passando classes para o input interno do Combobox
-          inputClassName={theme === 'dark' 
-            ? "w-full p-4 bg-gray-700 text-lg text-gray-100 border border-gray-600 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out placeholder-gray-400"
-            // Garante que o input interno do Combobox seja Cinza Claro
-            : "w-full p-4 bg-gray-50 text-lg text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out placeholder-gray-500"
-          }
+          inputClassName={comboboxInputClasses} // Passa a classe corrigida
       />
       
       {/* 2. INPUT DE ODDS (Caixa de texto maior) */}
@@ -129,7 +124,6 @@ export function MatchSimulator({
           onChange={(e) => onSetOdds(filterOddsValue(e.target.value))} 
           placeholder="Ex: 1.85" 
           label="ODDS DA APOSTA"
-          theme={theme} // Passa o tema
       />
 
       {/* 3. Exibição do ELO */}

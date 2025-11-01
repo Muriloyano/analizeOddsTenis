@@ -1,14 +1,12 @@
-// Em: src/pages/Index.tsx (CÓDIGO FINAL COM MENU HAMBURGER E TEMA DINÂMICO)
+// Em: src/pages/Index.tsx (CÓDIGO FINAL DE LAYOUT ESTÁVEL, RESULTADO NA MESMA PÁGINA)
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { MatchSimulator, SimulationData } from "../components/MatchSimulator";
 import { Top25Ranking } from "../components/Top25Ranking"; 
 import { toast } from "sonner"; 
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // NOVO: Importa useAuth para Logout
-import { useTheme } from '../contexts/ThemeContext'; // NOVO: Importa useTheme para a troca de tema
+// REMOVIDO: import { useNavigate } from 'react-router-dom'; // Remover hook de navegação para estabilizar
 
-// --- TIPOS DE DADOS ESTRUTURAIS (Mantidos) ---
+// --- TIPOS DE DADOS ESTRUTURAIS ---
 type JogadorElo = {
   rank: number;
   nome: string;
@@ -41,36 +39,29 @@ const getRecommendation = (ev1: number, ev2: number, player1: string, player2: s
 
 // --- COMPONENTE PRINCIPAL (PÁGINA) ---
 const Index = (): JSX.Element => { 
-  const navigate = useNavigate();
-  const { logout } = useAuth(); // NOVO: Função para Logout
-  const { theme, toggleTheme } = useTheme(); // NOVO: Tema e função de toggle
+  // REMOVIDO: const navigate = useNavigate();
 
   // --- ESTADOS DE DADOS DA APLICAÇÃO ---
   const [ranking, setRanking] = useState<JogadorElo[]>([]); 
-  const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null);
+  // ESTADO QUE ARMAZENA O RESULTADO NA PRÓPRIA PÁGINA
+  const [simulationResult, setSimulationResult] = useState<AnalysisResult | null>(null); 
+  
   const [selectedPlayer1, setSelectedPlayer1] = useState<string>(''); 
   const [selectedPlayer2, setSelectedPlayer2] = useState<string>(''); 
   const [odds1, setOdds1] = useState<string>('');
   const [odds2, setOdds2] = useState<string>('');
+
+  // ESTADOS DE CONTROLE
   const [isLoading, setIsLoading] = useState<boolean>(false); 
   const [isFetchingRanking, setIsFetchingRanking] = useState<boolean>(true);
-  
-  // NOVO: Estado para abrir/fechar o menu hamburger
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 
-  // --- CONFIGURAÇÃO DE TEMA DINÂMICA ---
-  // Define classes de fundo e texto com base no tema atual
-  const backgroundClass = theme === 'dark' ? 'bg-gray-950 text-gray-100' : 'bg-white text-gray-900';
-  const headerColor = theme === 'dark' ? 'text-white' : 'text-gray-800';
-  const menuButtonClass = theme === 'dark' 
-    ? 'bg-gray-700 hover:bg-gray-600 text-white' 
-    : 'bg-gray-200 hover:bg-gray-300 text-gray-800';
-  const dropdownBg = theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-300';
-  const itemHover = theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100';
+  // --- CONFIGURAÇÃO DE TEMA (DARK MODE FIXO) ---
+  const backgroundClass = 'bg-gray-950 text-gray-100';
+  const headerColor = 'text-white';
 
 
-  // --- FUNÇÕES DE LÓGICA (Mantidas) ---
+  // --- FETCH RANKING (Mantido) ---
   const fetchRanking = useCallback(async () => {
     setIsFetchingRanking(true);
     try {
@@ -91,6 +82,7 @@ const Index = (): JSX.Element => {
     document.title = "Simulador de Confrontos no Tênis (By ELo)";
   }, [fetchRanking]);
 
+  // --- LÓGICA DE SIMULAÇÃO (RETORNA RESULTADO NA PRÓPRIA PÁGINA) ---
   const handleSimulate = useCallback((data: SimulationData) => {
     setIsLoading(true);
     try {
@@ -105,7 +97,9 @@ const Index = (): JSX.Element => {
         odds1: data.odds1, odds2: data.odds2, recommendation: recommendation,
       };
 
-      navigate('/results', { state: { result } });
+      // AQUI: Salva o resultado no estado para renderizar no final da página
+      setSimulationResult(result);
+      toast.success('Análise concluída!');
 
     } catch (error) {
       console.error("Erro na simulação:", error);
@@ -113,7 +107,7 @@ const Index = (): JSX.Element => {
     } finally {
       setIsLoading(false);
     }
-  }, [navigate]);
+  }, []);
 
   const handleCentralButtonClick = () => {
     if (!selectedPlayer1 || !selectedPlayer2 || !odds1 || !odds2 || selectedPlayer1 === selectedPlayer2) {
@@ -131,7 +125,7 @@ const Index = (): JSX.Element => {
     });
   };
   
-  // ... (renderFloatingResults mantido) ...
+  // --- FUNÇÃO PARA RENDERIZAR RESULTADOS (Aparece no final da página) ---
   const renderFloatingResults = useMemo(() => {
     if (!simulationResult) return null;
 
@@ -140,12 +134,8 @@ const Index = (): JSX.Element => {
 
     const EvCard = ({ player, ev, isBest }: { player: string, ev: number, isBest: boolean }) => {
         const colorClass = ev >= 5 ? 'text-green-400' : ev > 0 ? 'text-yellow-400' : 'text-red-400';
-        // Adapta o card de resultado para o tema claro/escuro
-        const cardBg = theme === 'dark' ? 'bg-gray-700/80 border-indigo-400' : 'bg-indigo-50/80 border-indigo-400 text-gray-900';
-        const cardBgBest = theme === 'dark' ? 'bg-gray-700/80 border border-indigo-400' : 'bg-indigo-100/80 border border-indigo-600 text-gray-900';
-
         return (
-            <div className={`p-3 rounded-lg text-center ${isBest ? cardBgBest : cardBg} pointer-events-auto`}>
+            <div className={`p-3 rounded-lg text-center ${isBest ? 'bg-gray-700/80 border border-indigo-400' : 'bg-gray-700/50'} pointer-events-auto`}>
                 <p className="text-sm font-medium text-gray-400">{player}</p>
                 <p className={`text-xl font-bold ${colorClass}`}>{ev.toFixed(2)}% EV</p>
             </div>
@@ -164,7 +154,7 @@ const Index = (): JSX.Element => {
                 <p className="text-sm font-semibold text-indigo-200">Conclusão:</p>
                 <p className="text-base text-white mt-1">{simulationResult.recommendation}</p>
                 <button 
-                  onClick={() => setSimulationResult(null)}
+                  onClick={() => setSimulationResult(null)} // Botão Volta ao Formulário
                   className="mt-2 text-sm text-indigo-300 hover:text-indigo-100 font-medium"
                 >
                   (Nova Análise)
@@ -172,7 +162,7 @@ const Index = (): JSX.Element => {
             </div>
         </div>
     );
-  }, [simulationResult, theme]);
+  }, [simulationResult]);
 
 
   // --- RENDERIZAÇÃO PRINCIPAL (O JSX) ---
@@ -185,49 +175,11 @@ const Index = (): JSX.Element => {
   }
 
   return (
-    // Usa a classe de fundo dinâmica
     <div className={`min-h-screen ${backgroundClass} relative overflow-hidden flex flex-col items-center`}> 
       
       {/* Círculo de Degrade Verde (Estético) */}
       <div className="absolute top-0 left-0 w-96 h-96 blur-3xl opacity-30 z-0 pointer-events-none">
           <div className="w-full h-full rounded-full bg-green-500/50 transform translate-x-[-50%] translate-y-[-50%]"></div>
-      </div>
-      
-      {/* NOVO: Botão de Menu (Hamburger) no Canto Superior Direito */}
-      <div className="absolute top-6 right-6 z-50">
-          <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`p-3 rounded-full shadow-lg ${menuButtonClass} focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150`}
-          >
-              {isMenuOpen ? '✕' : '☰'} 
-          </button>
-          
-          {/* Menu Dropdown */}
-          {isMenuOpen && (
-              <div 
-                  className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-50 ${dropdownBg}`}
-              >
-                  {/* Item 1: Troca de Tema */}
-                  <button
-                      onClick={() => { toggleTheme(); setIsMenuOpen(false); }}
-                      className={`flex items-center w-full px-4 py-2 text-sm text-left ${itemHover}`}
-                  >
-                      {theme === 'dark' ? '☀️ Modo Claro' : '🌙 Modo Escuro'}
-                  </button>
-                  
-                  {/* Separador */}
-                  <div className={`h-px my-1 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`} />
-                  
-                  {/* Item 2: Logout */}
-                  <button
-                      onClick={() => { logout(); setIsMenuOpen(false); }}
-                      className={`flex items-center w-full px-4 py-2 text-sm text-left font-semibold 
-                          ${theme === 'dark' ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'}`}
-                  >
-                      Sair (Logout)
-                  </button>
-              </div>
-          )}
       </div>
       
       {/* Título Principal no Topo */}
@@ -240,21 +192,21 @@ const Index = (): JSX.Element => {
         </p>
       </div>
 
-      {/* CONTAINER PRINCIPAL: FLEX BOX DE 2 COLUNAS */}
+      {/* CONTAINER PRINCIPAL: FLEX BOX DE 2 COLUNAS PARA ESTABILIDADE */}
       <div className="container mx-auto py-4 relative z-10 flex items-start justify-center flex-grow max-w-6xl px-4 space-x-12">
         
-        {/* 1. COLUNA ESQUERDA: TABELA TOP 25 */}
+        {/* 1. COLUNA ESQUERDA: TABELA TOP 25 (Largura Fixa) */}
         <div className="flex-none w-[400px] mt-4"> 
-            {ranking.length > 0 && (
-            <Top25Ranking ranking={ranking} theme={theme} />
-            )}
+          {ranking.length > 0 && (
+              <Top25Ranking ranking={ranking} />
+          )}
         </div>
 
         {/* 2. COLUNA DIREITA: FORMULÁRIOS J1 e J2 LADO A LADO + BOTÃO */}
         <div className="flex-1 flex flex-col items-center mt-4 w-full">
             
             {/* LINHA 1: JOGADOR 1 e JOGADOR 2 LADO A LADO */}
-            <div className="flex w-full justify-between space-x-8">
+            <div className="flex w-full justify-center space-x-8">
                 
                 {/* JOGADOR 1 (Esquerda) */}
                 <div className="flex-1 w-full"> 
@@ -262,7 +214,6 @@ const Index = (): JSX.Element => {
                       ranking={ranking} isLoading={isLoading} playerNumber={1}
                       selectedPlayer={selectedPlayer1} onSelectPlayer={setSelectedPlayer1}
                       odds={odds1} onSetOdds={setOdds1} otherPlayerValue={selectedPlayer2}
-                      theme={theme} // Passa o tema para o MatchSimulator
                   />
                 </div>
 
@@ -272,14 +223,13 @@ const Index = (): JSX.Element => {
                       ranking={ranking} isLoading={isLoading} playerNumber={2}
                       selectedPlayer={selectedPlayer2} onSelectPlayer={setSelectedPlayer2}
                       odds={odds2} onSetOdds={setOdds2} otherPlayerValue={selectedPlayer1}
-                      theme={theme} // Passa o tema para o MatchSimulator
                   />
                 </div>
                 
             </div>
             
-             {/* Botão CALCULATE PROBABILITY */}
-            <div className="mt-8 w-full max-w-md text-center">
+             {/* Botão CALCULATE PROBABILITY (Centralizado abaixo das caixas) */}
+            <div className="mt-8 w-full max-w-sm text-center">
                  <button
                     type="button"
                     className="w-full px-6 py-3 font-bold text-gray-900 bg-green-500 rounded-xl hover:bg-green-600 transition duration-150 ease-in-out disabled:bg-gray-700 disabled:text-gray-500 shadow-xl"
@@ -290,10 +240,11 @@ const Index = (): JSX.Element => {
                  </button>
             </div>
             
-            {/* Área de Resultados */}
+            {/* Área de Resultados (Aparece abaixo do Botão) */}
             {renderFloatingResults}
             
         </div>
+        
       </div>
     </div>
   );
