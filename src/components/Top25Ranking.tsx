@@ -1,4 +1,4 @@
-// Em: src/components/Top25Ranking.tsx (Corrigido para Altura)
+// Em: src/components/Top25Ranking.tsx (Substitua todo o conteúdo)
 
 import React from 'react';
 
@@ -10,21 +10,26 @@ type JogadorElo = {
 
 type RankingProps = {
     ranking: JogadorElo[];
+    theme: 'dark' | 'light'; // <--- NOVA PROP
 };
 
-export function Top25Ranking({ ranking }: RankingProps) {
+export function Top25Ranking({ ranking, theme }: RankingProps) {
     const top25 = ranking.slice(0, 25); 
 
+    const cardBg = theme === 'dark' ? 'bg-gray-800/90 border-gray-700' : 'bg-white border-gray-300';
+    const headerBg = theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700';
+    const bodyText = theme === 'dark' ? 'text-gray-400' : 'text-gray-600';
+    const nameText = theme === 'dark' ? 'text-white' : 'text-gray-900';
+    const hoverBg = theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-100';
+
     return (
-        // Altura h-full para que ela ocupe a altura da coluna e max-w-full
-        <div className="bg-gray-800/90 p-4 rounded-xl border border-gray-700 shadow-2xl space-y-4 w-full h-full"> 
-            <h3 className="text-xl font-bold text-center text-green-400 uppercase">
+        <div className={`p-4 rounded-xl shadow-2xl space-y-4 w-full h-full ${cardBg}`}> 
+            <h3 className="text-xl font-bold text-center text-green-400 mb-4 uppercase">
                 ATP Elo Ranking (Top 25)
             </h3>
-            {/* Altura fixa (h-96) para o scroll, para alinhar com os formulários */}
             <div className="max-h-96 h-96 overflow-y-auto"> 
-                <table className="w-full text-left text-sm text-gray-400">
-                    <thead className="text-xs uppercase bg-gray-700 text-gray-200 sticky top-0">
+                <table className="w-full text-left text-sm">
+                    <thead className={`text-xs uppercase sticky top-0 ${headerBg}`}>
                         <tr>
                             <th scope="col" className="py-2 px-3">#</th>
                             <th scope="col" className="py-2 px-3">JOGADOR</th>
@@ -33,10 +38,10 @@ export function Top25Ranking({ ranking }: RankingProps) {
                     </thead>
                     <tbody>
                         {top25.map((jogador, index) => (
-                            <tr key={jogador.rank || index} className="border-b border-gray-700 hover:bg-gray-700/50">
-                                <td className="py-2 px-3 font-medium text-white">{jogador.rank}</td>
-                                <td className="py-2 px-3">{jogador.nome}</td>
-                                <td className="py-2 px-3 text-right font-mono text-green-300">{jogador.elo.toFixed(0)}</td>
+                            <tr key={jogador.rank || index} className={`border-b border-gray-700 ${hoverBg}`}>
+                                <td className={`py-2 px-3 font-medium ${nameText}`}>{jogador.rank}</td>
+                                <td className={`py-2 px-3 ${bodyText}`}>{jogador.nome}</td>
+                                <td className={`py-2 px-3 text-right font-mono text-green-300`}>{jogador.elo.toFixed(0)}</td>
                             </tr>
                         ))}
                     </tbody>
