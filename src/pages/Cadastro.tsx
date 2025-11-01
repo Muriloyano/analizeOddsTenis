@@ -1,4 +1,4 @@
-// Em: src/pages/Cadastro.tsx (AJUSTE DE CAMPOS DATA E SELECT)
+// Em: src/pages/Cadastro.tsx (AJUSTE FINAL DO CAMPO 'COMO CONHECEU')
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,7 @@ const Cadastro = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [birthDate, setBirthDate] = useState('');
-    const [source, setSource] = useState(''); // Agora é o valor do SELECT
+    const [source, setSource] = useState(''); // VOLTOU A SER INPUT DE TEXTO
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -57,7 +57,7 @@ const Cadastro = () => {
                 
                 <form onSubmit={handleCadastro} className="space-y-4">
                     
-                    {/* Campo Nome (First Name) */}
+                    {/* Campo Nome */}
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Nome</label>
                         <input
@@ -70,7 +70,7 @@ const Cadastro = () => {
                         />
                     </div>
                     
-                    {/* Campo Sobrenome (Last Name) */}
+                    {/* Campo Sobrenome */}
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Sobrenome</label>
                         <input
@@ -83,34 +83,29 @@ const Cadastro = () => {
                         />
                     </div>
                     
-                    {/* Campo Data de Nascimento - AQUI REMOVEMOS O ÍCONE (Chrome/Edge) */}
+                    {/* Campo Data de Nascimento */}
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Data de Nascimento</label>
                         <input
                             type="date"
                             value={birthDate}
                             onChange={(e) => setBirthDate(e.target.value)}
-                            // O estilo 'appearance-none' em Tailwind/CSS tenta remover a UI nativa (ícone) do navegador
+                            // Mantemos o appearance-none para tentar remover o ícone nativo do calendário
                             className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500 appearance-none" 
                             required
                         />
                     </div>
                     
-                    {/* Campo Como Conheceu - MUDADO PARA SELECT */}
+                    {/* Campo Como Conheceu - AGORA É TEXTO SIMPLES (Uniformidade) */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Como conheceu nosso site?</label>
-                        <select
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Como conheceu nosso site? (Opcional)</label>
+                        <input
+                            type="text"
                             value={source}
                             onChange={(e) => setSource(e.target.value)}
-                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
-                            // Classes para garantir que a cor do texto seja branca e o fundo escuro
-                        >
-                            <option value="" disabled>Selecione uma opção...</option>
-                            <option value="Redes Sociais">Redes Sociais (Instagram, X, etc.)</option>
-                            <option value="Indicacao">Indicação de Conhecido / Amigo</option>
-                            <option value="Busca">Busca Orgânica (Google, Bing)</option>
-                            <option value="Outros">Outros</option>
-                        </select>
+                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500" 
+                            placeholder="Ex: Amigo, Redes Sociais, Google, etc."
+                        />
                     </div>
                     
                     {/* Campo E-mail */}
