@@ -35,7 +35,7 @@ const Login = () => {
         <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
             <div className="p-10 bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border border-gray-700">
                 <h2 className="text-4xl font-extrabold mb-8 text-center text-green-400">
-                    Acesso Restrito
+                    Login
                 </h2>
                 
                 {/* Formulário */}

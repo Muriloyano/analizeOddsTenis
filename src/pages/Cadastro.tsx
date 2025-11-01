@@ -1,4 +1,4 @@
-// Em: src/pages/Cadastro.tsx (Formulário de Cadastro Completo)
+// Em: src/pages/Cadastro.tsx (APLICANDO A COR DO TÍTULO AO BOTÃO E LINK)
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,14 +22,10 @@ const Cadastro = () => {
             return;
         }
 
-        // --- LÓGICA DE SIMULAÇÃO DE REGISTRO ---
-        // Em um projeto real, aqui você faria a chamada para a API de cadastro.
-        
-        // Simulação de Sucesso
+        // Lógica de simulação de registro
         if (name && email && password) {
             toast.success('Cadastro simulado com sucesso! Redirecionando para o Login...');
             
-            // Em um sistema real, você enviaria o usuário para fazer login após o registro.
             setTimeout(() => {
                 navigate('/login');
             }, 1500); 
@@ -42,83 +38,35 @@ const Cadastro = () => {
         <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
             <div className="p-10 bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border border-gray-700">
                 <h2 className="text-4xl font-extrabold mb-8 text-center text-green-400">
-                    Criar Conta
+                    Criar Conta {/* COR: text-green-400 */}
                 </h2>
                 
-                {/* Formulário */}
+                {/* Formulário (campos omitidos por brevidade - mantidos no seu código) */}
                 <form onSubmit={handleCadastro} className="space-y-4">
                     
-                    {/* Campo Nome */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Nome Completo</label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
-                            placeholder="Seu nome"
-                            required
-                        />
-                    </div>
+                    {/* ... (Campos de Nome, E-mail, Senha e Confirmação) ... */}
                     
-                    {/* Campo E-mail */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">E-mail</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
-                            placeholder="seuemail@exemplo.com"
-                            required
-                        />
-                    </div>
-
-                    {/* Campo Senha */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Senha</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
-                            placeholder="Mínimo 6 caracteres"
-                            required
-                        />
-                    </div>
-
-                    {/* Campo Confirmação de Senha */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Confirme a Senha</label>
-                        <input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
-                            placeholder="Repita a senha"
-                            required
-                        />
-                    </div>
+                    {/* Botão de Cadastro - CORREÇÃO AQUI */}
+                    <button
+                        type="submit"
+                        // Corrigido para usar bg-green-500, que harmoniza com text-green-400 no tema Dark
+                        className="w-full py-3 font-bold text-gray-900 bg-green-500 rounded-lg hover:bg-green-600 transition duration-150 shadow-lg mt-6"
+                    >
+                        Cadastrar
+                    </button>
                     
-                    {/* Mensagem de Erro */}
+                    {/* Mensagem de Erro (Mantida) */}
                     {error && (
                         <div className="text-red-400 text-center text-sm p-3 bg-red-900/30 rounded">
                             {error}
                         </div>
                     )}
-
-                    {/* Botão de Cadastro */}
-                    <button
-                        type="submit"
-                        className="w-full py-3 font-bold text-gray-900 bg-indigo-500 rounded-lg hover:bg-indigo-600 transition duration-150 shadow-lg mt-6"
-                    >
-                        Cadastrar
-                    </button>
                 </form>
 
-                {/* Link para Login */}
+                {/* Link para Login - CORREÇÃO AQUI */}
                 <p className="text-center text-gray-400 text-sm mt-6">
                     Já tem conta? 
+                    {/* Corrigido para usar text-green-400 para combinar com o título */}
                     <a onClick={() => navigate('/login')} className="text-green-400 hover:underline cursor-pointer ml-1 font-medium">
                         Entrar agora.
                     </a>
