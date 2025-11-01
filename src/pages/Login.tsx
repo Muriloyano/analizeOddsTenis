@@ -1,13 +1,13 @@
-// Em: src/pages/Login.tsx
+// Em: src/pages/Login.tsx (Com Link de Cadastro)
 
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext'; // Importa o hook de autenticação
+import { useAuth } from '../contexts/AuthContext'; 
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const { login, isAuthenticated } = useAuth();
-    const navigate = useNavigate();
-    
+    const navigate = useNavigate(); // Hook de navegação
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -22,16 +22,10 @@ const Login = () => {
         e.preventDefault();
         setError('');
 
-        // --- LÓGICA DE SIMULAÇÃO DE LOGIN ---
-        // Em um projeto real, aqui você faria uma chamada para a sua API de backend
-        // (Ex: fetch('/api/login', { method: 'POST', body: { email, password } }) )
-        
+        // Lógica de simulação de login
         if (email === 'teste@email.com' && password === '123456') {
-            // Se as credenciais básicas de teste forem corretas, chama o login do Context
             login({ id: 'user-123', name: 'Testador' });
-            
-            // O componente PrivateRoute no App.tsx agora libera a navegação para '/'
-            
+            // Não precisa de navigate aqui, o PrivateRoute no App.tsx cuidará disso.
         } else {
             setError('Credenciais incorretas. Use: teste@email.com / 123456');
         }
@@ -89,10 +83,11 @@ const Login = () => {
                     </button>
                 </form>
 
-                {/* Link para Cadastro */}
+                {/* NOVO LINK DE CADASTRO */}
                 <p className="text-center text-gray-400 text-sm mt-6">
-                    Não tem conta? 
-                    <a onClick={() => navigate('/cadastro')} className="text-indigo-400 hover:underline cursor-pointer ml-1">
+                    Ainda não tem conta? 
+                    <a onClick={() => navigate('/cadastro')} 
+                       className="text-indigo-400 hover:underline cursor-pointer ml-1 font-medium">
                         Cadastre-se aqui.
                     </a>
                 </p>
