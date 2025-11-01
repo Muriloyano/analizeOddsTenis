@@ -1,4 +1,4 @@
-// Em: src/pages/Login.tsx (LINK DE CADASTRO HARMONIZADO)
+// Em: src/pages/Login.tsx (CAMPOS DE INPUT RESTAURADOS)
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext'; 
@@ -34,34 +34,57 @@ const Login = () => {
         <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
             <div className="p-10 bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border border-gray-700">
                 <h2 className="text-4xl font-extrabold mb-8 text-center text-green-400">
-                    Acesso Restrito
+                    Login
                 </h2>
                 
-                {/* Formulário (campos omitidos por brevidade - mantidos no seu código) */}
+                {/* Formulário */}
                 <form onSubmit={handleLogin} className="space-y-6">
                     
-                    {/* ... (Campos de E-mail e Senha) ... */}
+                    {/* CAMPO 1: E-mail (RESTAURADO) */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">E-mail</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
+                            placeholder="seuemail@exemplo.com"
+                            required
+                        />
+                    </div>
 
-                    {/* Botão de Login (Mantido com a cor green-500) */}
-                    <button
-                        type="submit"
-                        className="w-full py-3 font-bold text-gray-900 bg-green-500 rounded-lg hover:bg-green-600 transition duration-150 shadow-lg"
-                    >
-                        Entrar no Simulador
-                    </button>
+                    {/* CAMPO 2: Senha (RESTAURADO) */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Senha</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
+                            placeholder="******"
+                            required
+                        />
+                    </div>
                     
-                    {/* Mensagem de Erro (Mantida) */}
+                    {/* Mensagem de Erro */}
                     {error && (
                         <div className="text-red-400 text-center text-sm p-3 bg-red-900/30 rounded">
                             {error}
                         </div>
                     )}
+
+                    {/* Botão de Login */}
+                    <button
+                        type="submit"
+                        className="w-full py-3 font-bold text-gray-900 bg-green-500 rounded-lg hover:bg-green-600 transition duration-150 shadow-lg"
+                    >
+                        Entrar
+                    </button>
                 </form>
 
-                {/* Link para Cadastro - CORREÇÃO AQUI */}
+                {/* Link para Cadastro */}
                 <p className="text-center text-gray-400 text-sm mt-6">
                     Ainda não tem conta? 
-                    {/* Corrigido para text-green-400 */}
                     <a onClick={() => navigate('/cadastro')} className="text-green-400 hover:underline cursor-pointer ml-1 font-medium">
                         Cadastre-se aqui.
                     </a>

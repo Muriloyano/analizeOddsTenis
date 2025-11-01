@@ -1,4 +1,4 @@
-// Em: src/pages/Cadastro.tsx (CORRIGIDO E EXPANDIDO)
+// Em: src/pages/Cadastro.tsx (AJUSTE DE CAMPOS DATA E SELECT)
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,11 +7,10 @@ import { toast } from 'sonner';
 const Cadastro = () => {
     const navigate = useNavigate();
     
-    // NOVOS ESTADOS PARA OS NOVOS CAMPOS
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [birthDate, setBirthDate] = useState('');
-    const [source, setSource] = useState(''); // Como conheceu
+    const [source, setSource] = useState(''); // Agora é o valor do SELECT
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,12 +27,11 @@ const Cadastro = () => {
 
         // Verifica se os campos obrigatórios estão preenchidos
         if (!firstName || !lastName || !birthDate || !email || !password) {
-            setError('Por favor, preencha todos os campos obrigatórios (Nome, Sobrenome, Data de Nasc., E-mail, Senha).');
+            setError('Por favor, preencha todos os campos obrigatórios.');
             return;
         }
 
-        // Lógica de simulação de registro
-        // Em um projeto real, você enviaria todos esses dados para o backend
+        // Simulação de Sucesso
         console.log({ 
             firstName, 
             lastName, 
@@ -85,28 +83,34 @@ const Cadastro = () => {
                         />
                     </div>
                     
-                    {/* Campo Data de Nascimento */}
+                    {/* Campo Data de Nascimento - AQUI REMOVEMOS O ÍCONE (Chrome/Edge) */}
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Data de Nascimento</label>
                         <input
                             type="date"
                             value={birthDate}
                             onChange={(e) => setBirthDate(e.target.value)}
-                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
+                            // O estilo 'appearance-none' em Tailwind/CSS tenta remover a UI nativa (ícone) do navegador
+                            className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500 appearance-none" 
                             required
                         />
                     </div>
                     
-                    {/* Campo Como Conheceu */}
+                    {/* Campo Como Conheceu - MUDADO PARA SELECT */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Como conheceu nosso site? (Opcional)</label>
-                        <input
-                            type="text"
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Como conheceu nosso site?</label>
+                        <select
                             value={source}
                             onChange={(e) => setSource(e.target.value)}
                             className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-green-500 focus:border-green-500"
-                            placeholder="Ex: Amigo, Google, etc."
-                        />
+                            // Classes para garantir que a cor do texto seja branca e o fundo escuro
+                        >
+                            <option value="" disabled>Selecione uma opção...</option>
+                            <option value="Redes Sociais">Redes Sociais (Instagram, X, etc.)</option>
+                            <option value="Indicacao">Indicação de Conhecido / Amigo</option>
+                            <option value="Busca">Busca Orgânica (Google, Bing)</option>
+                            <option value="Outros">Outros</option>
+                        </select>
                     </div>
                     
                     {/* Campo E-mail */}
@@ -155,7 +159,7 @@ const Cadastro = () => {
                         </div>
                     )}
 
-                    {/* Botão de Cadastro (Corrigido para green-500) */}
+                    {/* Botão de Cadastro */}
                     <button
                         type="submit"
                         className="w-full py-3 font-bold text-gray-900 bg-green-500 rounded-lg hover:bg-green-600 transition duration-150 shadow-lg mt-6"
@@ -164,7 +168,7 @@ const Cadastro = () => {
                     </button>
                 </form>
 
-                {/* Link para Login (Corrigido para text-green-400) */}
+                {/* Link para Login */}
                 <p className="text-center text-gray-400 text-sm mt-6">
                     Já tem conta? 
                     <a onClick={() => navigate('/login')} className="text-green-400 hover:underline cursor-pointer ml-1 font-medium">
