@@ -1,4 +1,4 @@
-// Em: src/pages/Login.tsx (CAMPOS DE INPUT RESTAURADOS)
+// Em: src/pages/Login.tsx (LÓGICA REAL DE VERIFICAÇÃO DE BANCO)
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext'; 
@@ -18,29 +18,56 @@ const Login = () => {
         return null;
     }
 
-    const handleLogin = (e: React.FormEvent) => {
+    // FUNÇÃO handleLogin ADAPTADA PARA O BANCO DE DADOS
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
-        // Lógica de simulação de login
-        if (email === 'teste@email.com' && password === '123456') {
-            login({ id: 'user-123', name: 'Testador' });
-        } else {
-            setError('Credenciais incorretas. Use: teste@email.com / 123456');
+        if (!email || !password) {
+            setError('Preencha e-mail e senha.');
+            return;
+        }
+
+        try {
+            // CHAMADA PARA A API DE LOGIN (VERIFICAÇÃO NO BANCO)
+            const response = await fetch('/api/login', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Se a API retornar 401 (Credenciais Inválidas) ou 500 (Erro de Servidor)
+                setError(data.error || 'Falha na comunicação com o servidor.');
+                return;
+            }
+
+            // SUCESSO: Chama o login do Context com os dados do banco
+            login({ id: data.user.id, name: data.user.firstName }); 
+
+            // Não precisa de navigate aqui; o PrivateRoute cuidará da navegação para '/'
+            
+        } catch (err) {
+            console.error(err);
+            setError('Erro de rede ou servidor de autenticação inacessível.');
         }
     };
+    
+    // ... (restante do código JSX) ...
 
     return (
         <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
             <div className="p-10 bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border border-gray-700">
                 <h2 className="text-4xl font-extrabold mb-8 text-center text-green-400">
-                    Login
+                    Acesso Restrito
                 </h2>
                 
                 {/* Formulário */}
                 <form onSubmit={handleLogin} className="space-y-6">
                     
-                    {/* CAMPO 1: E-mail (RESTAURADO) */}
+                    {/* CAMPO 1: E-mail */}
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">E-mail</label>
                         <input
@@ -53,7 +80,7 @@ const Login = () => {
                         />
                     </div>
 
-                    {/* CAMPO 2: Senha (RESTAURADO) */}
+                    {/* CAMPO 2: Senha */}
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Senha</label>
                         <input
@@ -78,7 +105,7 @@ const Login = () => {
                         type="submit"
                         className="w-full py-3 font-bold text-gray-900 bg-green-500 rounded-lg hover:bg-green-600 transition duration-150 shadow-lg"
                     >
-                        Entrar
+                        Entrar no Simulador
                     </button>
                 </form>
 
