@@ -1,4 +1,4 @@
-// Em: src/App.tsx (CÓDIGO FINAL DE ROTEADOR E AUTENTICAÇÃO COM TEMA)
+// Em: src/App.tsx
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,7 +9,7 @@ import React from 'react';
 
 // Importa contextos e componentes de rotas
 import { AuthProvider } from "./contexts/AuthContext"; 
-import { ThemeProvider } from "./contexts/ThemeContext"; // <- Importa o provedor de tema
+import { ThemeProvider } from "./contexts/ThemeContext"; 
 import { PrivateRoute } from "./components/PrivateRoute"; 
 import Index from "./pages/Index"; 
 import NotFound from "./pages/NotFound";
@@ -19,11 +19,9 @@ import ResultsPage from "./pages/results";
 
 const queryClient = new QueryClient();
 
-// O componente principal da aplicação
 const App = () => (
-  // 1. AuthProvider e ThemeProvider envolvem tudo
   <AuthProvider> 
-    <ThemeProvider> {/* ADICIONADO: Provedor de Tema */}
+    <ThemeProvider> 
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
@@ -41,13 +39,12 @@ const App = () => (
                 <Route path="/results" element={<ResultsPage />} /> 
               </Route>
               
-              {/* Rota Catch-all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
-    </ThemeProvider> {/* FECHAMENTO ADICIONADO */}
+    </ThemeProvider> 
   </AuthProvider>
 );
 
