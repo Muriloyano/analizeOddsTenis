@@ -1,4 +1,4 @@
-// Em: src/components/Top25Ranking.tsx (Substitua todo o conteúdo)
+// Em: src/components/Top25Ranking.tsx (VERSÃO FINAL COM TEMA CLARO APRIMORADO)
 
 import React from 'react';
 
@@ -10,13 +10,17 @@ type JogadorElo = {
 
 type RankingProps = {
     ranking: JogadorElo[];
-    theme: 'dark' | 'light'; // <--- NOVA PROP
+    theme: 'dark' | 'light'; // <--- USADO PARA ALTERAR O ESTILO
 };
 
 export function Top25Ranking({ ranking, theme }: RankingProps) {
     const top25 = ranking.slice(0, 25); 
 
-    const cardBg = theme === 'dark' ? 'bg-gray-800/90 border-gray-700' : 'bg-white border-gray-300';
+    // Classes para o modo claro (Cinza suave)
+    const cardBg = theme === 'dark' 
+        ? 'bg-gray-800/90 border-gray-700' 
+        : 'bg-gray-100 border-gray-300'; // Fundo Cinza Claro
+        
     const headerBg = theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700';
     const bodyText = theme === 'dark' ? 'text-gray-400' : 'text-gray-600';
     const nameText = theme === 'dark' ? 'text-white' : 'text-gray-900';
